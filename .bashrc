@@ -67,8 +67,20 @@ export GREP_COLOR='1;31' # green for matches
 ## -- 3) User-customized code  --
 ## ------------------------------
 
+SOURCE="${BASH_SOURCE[0]}"
+DIR="$( dirname "$SOURCE" )"
+
 ## Define any user-specific variables you want here.
-source ~/dev/dotfiles/.bashrc_custom
+CUSTOM_BASHRC="$DIR/.bashrc_custom"
+if [ -f $CUSTOM_BASHRC ]; then
+  . $CUSTOM_BASHRC
+fi
+
+BASH_COMPLETION_SCRIPT="$DIR/.git-completion.bash"
+if [ -f $BASH_COMPLETION_SCRIPT ]; then
+  . $BASH_COMPLETION_SCRIPT
+fi
+
 
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 
