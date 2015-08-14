@@ -21,7 +21,7 @@ function _git_prompt() {
 }
 
 function _prompt_command() {
-    PS1='\[\e[1;37m\]\u@\h\[\e[0m\] \w '"$(_git_prompt)"'\[\e[0;31m\]>\[\e[0;33m\]>\[\e[0;32m\]>\[\e[0m\] '
+    PS1='\[\e[1;37m\]\u@\h\[\e[0m\] \w '"$(_git_prompt)"'\n\[\e[0;31m\]>\[\e[0;33m\]>\[\e[0;32m\]>\[\e[0m\] '
 }
 
 PROMPT_COMMAND=_prompt_command
