@@ -33,6 +33,11 @@ set smartcase                   " ... unless they contain at least one capital l
 
 set tags=./tags;
 
+" Enable the list of buffers
+ let g:airline#extensions#tabline#enabled = 1
+" " Show just the filename
+ let g:airline#extensions#tabline#fnamemod = ':t'
+
 call plug#begin('~/.vim/plugged')
   Plug 'scrooloose/syntastic'
   Plug 'airblade/vim-gitgutter'
@@ -41,10 +46,13 @@ call plug#begin('~/.vim/plugged')
   Plug 'vim-ruby/vim-ruby'
   Plug 'tpope/vim-rails'
   Plug 'tpope/vim-bundler'
+  Plug 'ngmy/vim-rubocop'
   Plug 'pangloss/vim-javascript'
   Plug 'marijnh/tern_for_vim'
   Plug 'helino/vim-json'
   Plug 'nathanaelkane/vim-indent-guides'
   Plug 'mattn/emmet-vim'
+  Plug 'fatih/vim-go'
+  Plug 'bling/vim-airline'
 call plug#end()
 
