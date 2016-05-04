@@ -20,8 +20,8 @@ filetype plugin on              " Enable filetype-specific plugins
 
 "" Whitespace
 set nowrap                      " don't wrap lines
-set tabstop=2 shiftwidth=2      " a tab is two spaces (or set this to 4)
-set softtabstop=2
+set tabstop=4 shiftwidth=4      " a tab is two spaces (or set this to 4)
+set softtabstop=4
 set expandtab                   " use spaces, not tabs (optional)
 set backspace=indent,eol,start  " backspace through everything in insert mode
 
@@ -31,29 +31,36 @@ set incsearch                   " incremental searching
 set ignorecase                  " searches are case insensitive...
 set smartcase                   " ... unless they contain at least one capital letter
 
-set tags=./tags;
+" Enable folding
+set foldmethod=indent
+set foldlevel=99
+
+set tags=~/.tags
 
 set laststatus=2
 " Enable the list of buffers
- let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#enabled = 1
 " " Show just the filename
- let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline#extensions#tabline#fnamemod = ':t'
 
 call plug#begin('~/.vim/plugged')
-  Plug 'scrooloose/syntastic'
-  Plug 'airblade/vim-gitgutter'
-  Plug 'Raimondi/delimitMate'
-  Plug 'Valloric/YouCompleteMe'
-  Plug 'vim-ruby/vim-ruby'
-  Plug 'tpope/vim-rails'
-  Plug 'tpope/vim-bundler'
-  Plug 'ngmy/vim-rubocop'
-  Plug 'pangloss/vim-javascript'
-  Plug 'marijnh/tern_for_vim'
-  Plug 'helino/vim-json'
-  Plug 'nathanaelkane/vim-indent-guides'
-  Plug 'mattn/emmet-vim'
-  Plug 'fatih/vim-go'
-  Plug 'bling/vim-airline'
+Plug 'scrooloose/syntastic'
+Plug 'airblade/vim-gitgutter'
+Plug 'Raimondi/delimitMate'
+Plug 'Valloric/YouCompleteMe'
+Plug 'vim-ruby/vim-ruby'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-bundler'
+Plug 'ngmy/vim-rubocop'
+Plug 'pangloss/vim-javascript'
+Plug 'marijnh/tern_for_vim'
+Plug 'helino/vim-json'
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'mattn/emmet-vim'
+Plug 'fatih/vim-go'
+Plug 'bling/vim-airline'
+Plug 'editorconfig/editorconfig-vim'
 call plug#end()
+
+autocmd BufWritePre * :%s/\s\+$//e
 
