@@ -19,6 +19,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'nvie/vim-flake8'
     Plug 'sickill/vim-monokai'
     Plug 'craigemery/vim-autotag'
+    Plug 'ctrlpvim/ctrlp.vim'
 call plug#end()
 
 set exrc
