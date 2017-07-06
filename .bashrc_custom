@@ -4,3 +4,20 @@ alias lss='lsof -Pnl +M -i4 -i6'
 alias ls-servers='netstat -tulpn'
 
 alias random-pass='dd if=/dev/random bs=1 count=18 2>/dev/null | base64'
+
+# Set your go home(where all your go projects are)
+# and everytime you enter this dir GOPATH and GOBIN
+# will be automatically be set
+export GOHOME=$HOME/dev/go
+
+function cd() {
+    builtin cd "$@"
+
+    curr_dir=$(pwd)
+
+    if [[ $curr_dir =~ $GOHOME ]]
+    then
+        export GOPATH=$curr_dir
+        export GOBIN=$GOPATH/bin
+    fi
+}
