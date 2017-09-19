@@ -5,6 +5,7 @@ alias ls-servers='netstat -tulpn'
 
 alias random-pass='dd if=/dev/random bs=1 count=18 2>/dev/null | base64'
 
+export DEVHOME=$HOME/dev
 # Set your go home(where all your go projects are)
 # and everytime you enter this dir GOPATH and GOBIN
 # will be automatically be set
@@ -20,4 +21,22 @@ function cd() {
         export GOPATH=$curr_dir
         export GOBIN=$GOPATH/bin
     fi
+
+    if [[ $curr_dir =~ $DEVHOME && -e $curr_dir/.env ]]
+    then
+        source $curr_dir/.env
+    fi
+}
+
+function spotify() {
+    docker stop spotify
+    docker run -d \
+        -v /etc/localtime:/etc/localtime:ro \
+        -v /tmp/.X11-unix:/tmp/.X11-unix \
+        -e DISPLAY=unix$DISPLAY \
+        --device /dev/snd:/dev/snd \
+        -v $HOME/.spotify/config:/home/spotify/.config/spotify \
+        -v $HOME/.spotify/cache:/home/spotify/spotify \
+        --name spotify \
+        giuliano/spotify
 }
