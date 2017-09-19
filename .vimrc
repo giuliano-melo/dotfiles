@@ -2,24 +2,23 @@ call plug#begin('~/.vim/plugged')
     Plug 'scrooloose/syntastic'
     Plug 'airblade/vim-gitgutter'
     Plug 'Raimondi/delimitMate'
-    Plug 'Valloric/YouCompleteMe'
     Plug 'vim-ruby/vim-ruby'
     Plug 'tpope/vim-rails'
     Plug 'tpope/vim-bundler'
     Plug 'ngmy/vim-rubocop'
     Plug 'pangloss/vim-javascript'
     Plug 'marijnh/tern_for_vim'
-    Plug 'helino/vim-json'
+    Plug 'elzr/vim-json'
     Plug 'nathanaelkane/vim-indent-guides'
     Plug 'mattn/emmet-vim'
     Plug 'fatih/vim-go'
-    Plug 'derekwyatt/vim-scala'
     Plug 'bling/vim-airline'
     Plug 'editorconfig/editorconfig-vim'
     Plug 'nvie/vim-flake8'
     Plug 'sickill/vim-monokai'
     Plug 'craigemery/vim-autotag'
     Plug 'ctrlpvim/ctrlp.vim'
+    Plug 'ajh17/VimCompletesMe'
 call plug#end()
 
 set exrc
@@ -58,13 +57,16 @@ set smartcase                   " ... unless they contain at least one capital l
 set foldmethod=indent
 set foldlevel=99
 
-" set tags=~/.tags
+set tags=~/.tags
 
 set laststatus=2
 " Enable the list of buffers
 let g:airline#extensions#tabline#enabled = 1
 " " Show just the filename
 let g:airline#extensions#tabline#fnamemod = ':t'
+
+" " disable vim-go tags mappings override
+let g:go_def_mapping_enabled = 0
 
 set t_Co=256
 colorscheme monokai
