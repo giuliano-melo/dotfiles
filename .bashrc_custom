@@ -9,18 +9,12 @@ export DEVHOME=$HOME/dev
 # Set your go home(where all your go projects are)
 # and everytime you enter this dir GOPATH and GOBIN
 # will be automatically be set
-export GOHOME=$HOME/dev/go
+export GOPATH=$HOME/dev/go
 
 function cd() {
     builtin cd "$@"
 
     curr_dir=$(pwd)
-
-    if [[ $curr_dir =~ $GOHOME ]]
-    then
-        export GOPATH=$curr_dir
-        export GOBIN=$GOPATH/bin
-    fi
 
     if [[ $curr_dir =~ $DEVHOME && -e $curr_dir/.env ]]
     then
@@ -33,6 +27,7 @@ function spotify() {
     docker run -d \
         -v /etc/localtime:/etc/localtime:ro \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
+        --rm \
         -e DISPLAY=unix$DISPLAY \
         --device /dev/snd:/dev/snd \
         -v $HOME/.spotify/config:/home/spotify/.config/spotify \
