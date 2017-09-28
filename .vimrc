@@ -19,6 +19,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'craigemery/vim-autotag'
     Plug 'ctrlpvim/ctrlp.vim'
     Plug 'ajh17/VimCompletesMe'
+    Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 call plug#end()
 
 set exrc
@@ -91,3 +92,11 @@ au BufNewFile,BufRead *.py
     \ set autoindent |
     \ set fileformat=unix |
 
+" Autoreload .vimrc
+augroup myvimrc
+    au!
+    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+augroup END
+
+" Format JSON files
+command FormatJson execute "%!python -m json.tool"
