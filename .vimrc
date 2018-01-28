@@ -16,10 +16,12 @@ call plug#begin('~/.vim/plugged')
     Plug 'editorconfig/editorconfig-vim'
     Plug 'nvie/vim-flake8'
     Plug 'sickill/vim-monokai'
+    Plug 'dracula/vim'
     Plug 'craigemery/vim-autotag'
     Plug 'ctrlpvim/ctrlp.vim'
     Plug 'ajh17/VimCompletesMe'
     Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+    Plug 'artur-shaik/vim-javacomplete2'
 call plug#end()
 
 set exrc
@@ -70,7 +72,8 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 let g:go_def_mapping_enabled = 0
 
 set t_Co=256
-colorscheme monokai
+color dracula
+" colorscheme monokai
 " set background=dark
 " colorscheme solarized
 
