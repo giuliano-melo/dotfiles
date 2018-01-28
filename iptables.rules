@@ -1,0 +1,29 @@
+*filter
+
+# Allow all loopback(lo0) and drop all traffic to 127/8 that don't user lo0
+-A INPUT -i lo -j ACCEPT
+-A INPUT ! -i lo -d 127.0.0.0/8 -j REJECT
+
+# Accept all established inbound connections
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow all inbound traffic
+-P OUTPUT  ACCEPT
+
+# log iptables denied calls (access via dmesg)
+-A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables denied: " --log-level 7
+
+# Reject ALL inbound
+-P INPUT  DROP
+-P FORWARD DROP
+
+# Arp Spoofing
+-N spoofing
+-I spoofing -j LOG --log-prefix "Spoofed source IP"
+-I spoofing -j DROP
+
+-A INPUT -s 255.0.0.0/8 -j spoofing
+-A INPUT -s 0.0.0.0/8 -j spoofing
+
+COMMIT
+
