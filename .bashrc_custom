@@ -5,6 +5,8 @@ alias ls-servers='netstat -tulpn'
 
 alias random-pass='dd if=/dev/random bs=1 count=18 2>/dev/null | base64'
 
+alias git-graph='git log --graph --all --oneline --decorate'
+
 export DEVHOME=$HOME/dev
 # Set your go home(where all your go projects are)
 # and everytime you enter this dir GOPATH and GOBIN
@@ -34,4 +36,8 @@ function spotify() {
         -v $HOME/.spotify/cache:/home/spotify/spotify \
         --name spotify \
         giuliano/spotify
+}
+
+generate_uuid() {
+    echo $(cat /proc/sys/kernel/random/uuid)
 }
