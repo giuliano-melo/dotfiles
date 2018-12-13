@@ -11,7 +11,6 @@ call plug#begin('~/.vim/plugged')
     Plug 'elzr/vim-json'
     Plug 'nathanaelkane/vim-indent-guides'
     Plug 'mattn/emmet-vim'
-    Plug 'fatih/vim-go'
     Plug 'bling/vim-airline'
     Plug 'editorconfig/editorconfig-vim'
     Plug 'nvie/vim-flake8'
@@ -20,8 +19,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'craigemery/vim-autotag'
     Plug 'ctrlpvim/ctrlp.vim'
     Plug 'ajh17/VimCompletesMe'
-    Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
     Plug 'artur-shaik/vim-javacomplete2'
+    Plug 'guns/vim-clojure-static'
 call plug#end()
 
 set exrc
@@ -68,8 +67,8 @@ let g:airline#extensions#tabline#enabled = 1
 " " Show just the filename
 let g:airline#extensions#tabline#fnamemod = ':t'
 
-" " disable vim-go tags mappings override
-let g:go_def_mapping_enabled = 0
+" Clojure stuff
+let g:clojure_maxlines = 100
 
 set t_Co=256
 color dracula
