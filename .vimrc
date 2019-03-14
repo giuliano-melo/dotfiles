@@ -59,7 +59,7 @@ set smartcase                   " ... unless they contain at least one capital l
 set foldmethod=indent
 set foldlevel=99
 
-set tags=~/.tags
+"" set tags=~/.tags
 
 set laststatus=2
 " Enable the list of buffers
@@ -70,9 +70,12 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 " Clojure stuff
 let g:clojure_maxlines = 100
 
+" Autotag confs
+let g:autotagTagsFile="~/.tags"
+
 set t_Co=256
-color dracula
-" colorscheme monokai
+" color dracula
+colorscheme monokai
 " set background=dark
 " colorscheme solarized
 

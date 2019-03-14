@@ -33,7 +33,7 @@ shopt -s histappend
 
 # Make prompt informative
 # See:  http://www.ukuug.org/events/linux2003/papers/bash_tips/
-PS1="\[\033[0;34m\][\u@\h:\w]$\[\033[0m\]"
+#PS1="\[\033[0;34m\][\u@\h:\w]$\[\033[0m\]"
 
 ## -----------------------
 ## -- 2) Set up aliases --
@@ -60,8 +60,8 @@ alias du='du -ch --max-depth=1'
 alias treeacl='tree -A -C -L 2'
 
 # 2.4) grep options
-export GREP_OPTIONS='--color=auto'
-export GREP_COLOR='1;31' # green for matches
+unset GREP_OPTIONS
+#export GREP_COLOR='1;31' # green for matches
 
 ## ------------------------------
 ## -- 3) User-customized code  --
