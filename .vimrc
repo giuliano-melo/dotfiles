@@ -21,6 +21,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'ajh17/VimCompletesMe'
     Plug 'artur-shaik/vim-javacomplete2'
     Plug 'guns/vim-clojure-static'
+    Plug 'leafgarland/typescript-vim'
 call plug#end()
 
 set exrc
