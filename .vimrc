@@ -7,16 +7,14 @@ call plug#begin('~/.vim/plugged')
   "Plug 'tpope/vim-bundler'
   "Plug 'ngmy/vim-rubocop'
   "Plug 'pangloss/vim-javascript'
-  Plug 'ternjs/tern_for_vim', {'do': 'npm install'}
-  "Plug 'jparise/vim-graphql'
-  "Plug 'dense-analysis/ale'
-  "Plug 'leafgarland/typescript-vim'
-  Plug 'ianks/vim-tsx'
-  "Plug 'mxw/vim-jsx'
+  "Plug 'ternjs/tern_for_vim', {'do': 'npm install'}
+  Plug 'pangloss/vim-javascript'    " JavaScript support
+  Plug 'leafgarland/typescript-vim' " TypeScript syntax
+  Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
+  Plug 'jparise/vim-graphql'        " GraphQL syntax
+  Plug 'ianks/vim-tsx'              " TSX syntax
   Plug 'sheerun/vim-polyglot'
-  Plug 'Quramy/tsuquyomi'
   "Plug 'elzr/vim-json'
-  "Plug 'artur-shaik/vim-javacomplete2'
   Plug 'nvie/vim-flake8'
   Plug 'mattn/emmet-vim'
   Plug 'nathanaelkane/vim-indent-guides'
@@ -24,7 +22,6 @@ call plug#begin('~/.vim/plugged')
   Plug 'editorconfig/editorconfig-vim'
   Plug 'ludovicchabant/vim-gutentags'
   Plug 'ctrlpvim/ctrlp.vim'
-  "Plug 'ajh17/VimCompletesMe'
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'sickill/vim-monokai'
   Plug 'dracula/vim'
@@ -48,18 +45,6 @@ set lazyredraw                  " redraw only when we need to."
 filetype on                     " Enable filetype detection
 filetype indent on              " Enable filetype-specific indenting
 filetype plugin on              " Enable filetype-specific plugins
-"set omnifunc=syntaxcomplete#Complete
-" Syntastic stuff
-autocmd FileType vim let b:vcm_tab_complete = 'vim'
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
 
 "" Whitespace
 set nowrap                      " don't wrap lines
@@ -88,8 +73,17 @@ let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_start_level=2
 let g:indent_guides_guide_size=1
 
-" Clojure stuff
-let g:clojure_maxlines = 100
+" CoC extensions
+let g:coc_global_extensions = ['coc-tsserver']
+" Remap keys for applying codeAction to the current line.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 
 " Gutentags confs
 let g:gutentags_cache_dir = '~/.tags'
@@ -142,10 +136,6 @@ let g:gutentags_ctags_exclude = [
       \ '*.pdf', '*.doc', '*.docx', '*.ppt', '*.pptx',
       \ ]
 
-" Typescript confs
-let g:tsuquyomi_disable_quickfix = 1
-let g:syntastic_typescript_checkers = ['tsuquyomi']
-
 set t_Co=256
 " color dracula
 colorscheme monokai
@@ -170,11 +160,6 @@ au BufNewFile,BufRead *.py
     \ set autoindent |
     \ set fileformat=unix |
 
-" Ale confs
-let g:ale_fix_on_save = 1
-let g:airline#extensions#ale#enabled = 1
-let g:ale_set_highlights = 0
-
 " Autoreload .vimrc
 augroup myvimrc
     au!
@@ -183,3 +168,6 @@ augroup END
 
 " Format JSON files
 command! FormatJson execute "%!python -m json.tool"
+
+" Prettier command
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
