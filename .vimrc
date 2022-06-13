@@ -35,6 +35,8 @@ set encoding=utf-8
 set showcmd                     " display incomplete commands
 set showmatch                   " highlight matching [{()}]}]"
 
+set clipboard=unnamed
+
 set colorcolumn=100
 set cursorline
 set hidden
