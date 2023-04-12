@@ -6,8 +6,6 @@ call plug#begin('~/.vim/plugged')
   "Plug 'tpope/vim-rails'
   "Plug 'tpope/vim-bundler'
   "Plug 'ngmy/vim-rubocop'
-  "Plug 'pangloss/vim-javascript'
-  "Plug 'ternjs/tern_for_vim', {'do': 'npm install'}
   Plug 'pangloss/vim-javascript'    " JavaScript support
   Plug 'leafgarland/typescript-vim' " TypeScript syntax
   Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
@@ -34,8 +32,6 @@ set nocompatible                " choose no compatibility with legacy vi
 set encoding=utf-8
 set showcmd                     " display incomplete commands
 set showmatch                   " highlight matching [{()}]}]"
-
-set clipboard=unnamed
 
 set colorcolumn=100
 set cursorline
@@ -75,6 +71,7 @@ let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_start_level=2
 let g:indent_guides_guide_size=1
 
+" leader = \
 " CoC extensions
 let g:coc_global_extensions = ['coc-tsserver']
 " Remap keys for applying codeAction to the current line.
@@ -86,6 +83,28 @@ nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+" Formatting selected code
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+" Use K to show documentation in preview window
+nnoremap <silent> K :call ShowDocumentation()<CR>
+
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
+
 
 " Gutentags confs
 let g:gutentags_cache_dir = '~/.tags'
@@ -141,8 +160,6 @@ let g:gutentags_ctags_exclude = [
 set t_Co=256
 " color dracula
 colorscheme monokai
-" set background=dark
-" colorscheme solarized
 
 " Generate backup files outside current dir
 set backupdir=~/.tmp,~/tmp,/var/tmp,/tmp
