@@ -1,67 +1,195 @@
+unlet! skip_defaults_vim
+source $VIMRUNTIME/defaults.vim
+
+syntax on
+filetype  plugin indent on
+
+set hlsearch incsearch ignorecase
+set number relativenumber
+set encoding=UTF-8
+
+nnoremap <leader>c :botright term<CR>
+
 call plug#begin('~/.vim/plugged')
-  "Plug 'scrooloose/syntastic'
+  Plug 'yegappan/lsp'
   Plug 'airblade/vim-gitgutter'
   Plug 'Raimondi/delimitMate'
-  "Plug 'vim-ruby/vim-ruby'
-  "Plug 'tpope/vim-rails'
-  "Plug 'tpope/vim-bundler'
-  "Plug 'ngmy/vim-rubocop'
-  Plug 'pangloss/vim-javascript'    " JavaScript support
-  Plug 'leafgarland/typescript-vim' " TypeScript syntax
-  Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
-  Plug 'jparise/vim-graphql'        " GraphQL syntax
-  Plug 'ianks/vim-tsx'              " TSX syntax
   Plug 'sheerun/vim-polyglot'
-  "Plug 'elzr/vim-json'
-  Plug 'nvie/vim-flake8'
   Plug 'mattn/emmet-vim'
   Plug 'nathanaelkane/vim-indent-guides'
   Plug 'bling/vim-airline'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'ludovicchabant/vim-gutentags'
   Plug 'ctrlpvim/ctrlp.vim'
-  Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'sickill/vim-monokai'
-  Plug 'dracula/vim'
+  Plug 'dense-analysis/ale'
+  Plug 'liuchengxu/vim-which-key'
+  Plug 'vim-test/vim-test', {'requires': 'tpope/vim-dispatch'}
+  Plug 'github/copilot.vim'
+  Plug 'puremourning/vimspector'
+  "Plug 'nvie/vim-flake8'
+  "Plug 'neoclide/coc.nvim', {'branch': 'release'}
+  "Plug 'dracula/vim'
+  "Plug 'scrooloose/syntastic'
+  "Plug 'vim-ruby/vim-ruby'
+  "Plug 'tpope/vim-rails'
+  "Plug 'tpope/vim-bundler'
+  "Plug 'ngmy/vim-rubocop'
+  "Plug 'elzr/vim-json'
+  "Plug 'pangloss/vim-javascript'    " JavaScript support
+  "Plug 'leafgarland/typescript-vim' " TypeScript syntax
+  "Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
+  "Plug 'jparise/vim-graphql'        " GraphQL syntax
+  "Plug 'ianks/vim-tsx'              " TSX syntax
 call plug#end()
 
-set exrc
-set secure
-syntax enable
-set nocompatible                " choose no compatibility with legacy vi
-set encoding=utf-8
-set showcmd                     " display incomplete commands
-set showmatch                   " highlight matching [{()}]}]"
+"--- LSP settings ---------------------------------------------------"
+let lspOptions = #{
+    \ aleSupport: v:true,
+    \ autoHighlight: v:true,
+    \ completionTextEdit: v:true,
+    \ noNewlineInCompletion: v:true,
+    \ outlineOnRight: v:true,
+    \ outlineWinSize: 70,
+    \ showDiagWithSign: v:false,
+    \ useQuickfixForLocations: v:true,
+    \ }
+autocmd VimEnter * call LspOptionsSet(lspOptions)
 
-set colorcolumn=100
-set cursorline
-set hidden
-set number
-set wildmenu                    " visual autocomplete for command menu"
-set lazyredraw                  " redraw only when we need to."
+"    \ #{ name: 'gopls', filetype: ['go', 'gomod'],  path: 'gopls', args: ['serve'] },
+"    \ #{ name: 'rustlang', filetype: ['rust'], path: 'rust-analyzer', args: [], syncInit: v:true },
+let lspServers = [
+    \ #{ name: 'pylsp', filetype: ['py', 'python'], path: 'pylsp', args: []        },
+    \ #{ name: 'clangd', filetype: ['c', 'cpp'], path: 'clangd', args: ['--background-index']},
+    \ #{ name: 'tslang', filetype: ['javascript', 'typescript'], path: 'typescript-language-server', args: ['--stdio'] },
+\ ]
+autocmd VimEnter * call LspAddServer(lspServers)
 
-filetype on                     " Enable filetype detection
-filetype indent on              " Enable filetype-specific indenting
-filetype plugin on              " Enable filetype-specific plugins
+"Enable auto selection of the fist autocomplete item"
+augroup LspSetup
+    au!
+    au User LspAttached set completeopt-=noselect
+augroup END
+"Disable newline on selecting completion option"
+inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<CR>"
 
-"" Whitespace
-set nowrap                      " don't wrap lines
-set tabstop=2 shiftwidth=2      " a tab is two spaces (or set this to 4)
-set softtabstop=2
-set expandtab                   " use spaces, not tabs (optional)
-set backspace=indent,eol,start  " backspace through everything in insert mode
+"Mappings for most-used functions"
+nnoremap <leader>i :LspHover<CR>
+nnoremap <leader>d :LspGotoDefinition<CR>
+nnoremap <leader>p :LspPeekDefinition<CR>
+nnoremap <leader>R :LspRename<CR>
+nnoremap <leader>r :LspPeekReferences<CR>
+nnoremap <leader>o :LspDocumentSymbol<CR>
 
-"" Searching
-set hlsearch                    " highlight matches
-set incsearch                   " incremental searching
-set ignorecase                  " searches are case insensitive...
-set smartcase                   " ... unless they contain at least one capital letter
+"--- ALE settings ------------------------------------------------------"
+"Disable ALE's LSP in favour of standalone LSP plugin"
+let g:ale_disable_lsp = 1
 
-" Enable folding
-set foldmethod=indent
-set foldlevel=99
+"Show linting errors with highlights"
+"* Can also be viewed in the loclist with :lope"
+let g:ale_set_signs = 1
+let g:ale_set_highlights = 1
+let g:ale_virtualtext_cursor = 1
+highlight ALEError ctermbg=none cterm=underline
 
-set laststatus=2
+"Define when to lint"
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_insert_leave = 1
+let g:ale_lint_on_text_change = 'never'
+
+"Set linters for individual filetypes"
+let g:ale_linters_explicit = 1
+let g:ale_linters = {
+    \ 'go': ['gofmt', 'gopls', 'govet', 'gobuild'],
+    \ 'python': ['ruff', 'mypy', 'pylsp'],
+\ }
+"Specify fixers for individual filetypes"
+let g:ale_fixers = {
+    \ '*': ['trim_whitespace'],
+    \ 'python': ['ruff'],
+    \ 'go': ['gopls', 'goimports', 'gofmt', 'gotype', 'govet'],
+\ }
+"Don't warn about trailing whitespace, as it is auto-fixed by '*' above"
+let g:ale_warn_about_trailing_whitespace = 0
+"Show info, warnings, and errors; Write which linter produced the message"
+let g:ale_lsp_show_message_severity = 'information'
+let g:ale_echo_msg_format = '[%linter%] [%severity%:%code%] %s'
+"Specify Containerfiles as Dockerfiles"
+let g:ale_linter_aliases = {"Containerfile": "dockerfile"}
+
+"Mapping to run fixers on file"
+nnoremap <leader>L :ALEFix<CR>
+
+"--- Vim Test settings -----------------------------------------------"
+nnoremap <leader>tn :TestNearest<CR>
+nnoremap <leader>tf :TestFile<CR>
+nnoremap <leader>ts :TestSuite<CR>
+nnoremap <leader>tl :TestLast<CR>
+
+let test#strategy = "dispatch"
+
+"--- Github Copilot settings -----------------------------------------------"
+let g:copilot_filetypes = {
+  \ '*': v:false,
+  \ 'python': v:true,
+  \ 'javascript': v:true,
+  \ 'typescript': v:true,
+  \ 'cpp': v:true,
+  \ 'c': v:true,
+  \ }
+
+"--- Vimspector settings -----------------------------------------------"
+let g:vimspector_enable_mappings='HUMAN'
+" mnemonic 'di' = 'debug inspect' (pick your own, if you prefer!)
+" for normal mode - the word under the cursor
+nmap <Leader>di <Plug>VimspectorBalloonEval
+" for visual mode, the visually selected text
+xmap <Leader>di <Plug>VimspectorBalloonEval
+command! VR :VimspectorReset
+
+"--- WhichKey settings ---------------------------------------------"
+"Put this before any of the other plugin-specific config"
+let g:mapleader = "\\"
+nnoremap <silent> <leader> :<c-u>WhichKey '\'<CR>
+set timeoutlen=200
+
+"set exrc
+"set secure
+"syntax enable
+"set nocompatible                " choose no compatibility with legacy vi
+"set encoding=utf-8
+"set showcmd                     " display incomplete commands
+"set showmatch                   " highlight matching [{()}]}]"
+"
+"set colorcolumn=100
+"set cursorline
+"set hidden
+"set number
+"set wildmenu                    " visual autocomplete for command menu"
+"set lazyredraw                  " redraw only when we need to."
+"
+"filetype on                     " Enable filetype detection
+"filetype indent on              " Enable filetype-specific indenting
+"filetype plugin on              " Enable filetype-specific plugins
+"
+""" Whitespace
+"set nowrap                      " don't wrap lines
+"set tabstop=2 shiftwidth=2      " a tab is two spaces (or set this to 4)
+"set softtabstop=2
+"set expandtab                   " use spaces, not tabs (optional)
+"set backspace=indent,eol,start  " backspace through everything in insert mode
+"
+""" Searching
+"set hlsearch                    " highlight matches
+"set incsearch                   " incremental searching
+"set ignorecase                  " searches are case insensitive...
+"set smartcase                   " ... unless they contain at least one capital letter
+"
+"" Enable folding
+"set foldmethod=indent
+"set foldlevel=99
+"
+"set laststatus=2
 " Enable the list of buffers
 let g:airline#extensions#tabline#enabled = 1
 " " Show just the filename
@@ -73,37 +201,37 @@ let g:indent_guides_guide_size=1
 
 " leader = \
 " CoC extensions
-let g:coc_global_extensions = ['coc-tsserver']
-" Remap keys for applying codeAction to the current line.
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Apply AutoFix to problem on the current line.
-nmap <leader>qf  <Plug>(coc-fix-current)
-" GoTo code navigation.
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-" Use `[g` and `]g` to navigate diagnostics
-" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-" Formatting selected code
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-
-inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
-inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-" Use K to show documentation in preview window
-nnoremap <silent> K :call ShowDocumentation()<CR>
-
-function! ShowDocumentation()
-  if CocAction('hasProvider', 'hover')
-    call CocActionAsync('doHover')
-  else
-    call feedkeys('K', 'in')
-  endif
-endfunction
+"let g:coc_global_extensions = ['coc-tsserver']
+"" Remap keys for applying codeAction to the current line.
+"nmap <leader>ac  <Plug>(coc-codeaction)
+"" Apply AutoFix to problem on the current line.
+"nmap <leader>qf  <Plug>(coc-fix-current)
+"" GoTo code navigation.
+"nmap <silent> gd <Plug>(coc-definition)
+"nmap <silent> gy <Plug>(coc-type-definition)
+"nmap <silent> gi <Plug>(coc-implementation)
+"nmap <silent> gr <Plug>(coc-references)
+"" Use `[g` and `]g` to navigate diagnostics
+"" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list
+"nmap <silent> [g <Plug>(coc-diagnostic-prev)
+"nmap <silent> ]g <Plug>(coc-diagnostic-next)
+"" Formatting selected code
+"xmap <leader>f  <Plug>(coc-format-selected)
+"nmap <leader>f  <Plug>(coc-format-selected)
+"
+"inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+"inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+"                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+"" Use K to show documentation in preview window
+"nnoremap <silent> K :call ShowDocumentation()<CR>
+"
+"function! ShowDocumentation()
+"  if CocAction('hasProvider', 'hover')
+"    call CocActionAsync('doHover')
+"  else
+"    call feedkeys('K', 'in')
+"  endif
+"endfunction
 
 
 " Gutentags confs
@@ -158,7 +286,6 @@ let g:gutentags_ctags_exclude = [
       \ ]
 
 set t_Co=256
-" color dracula
 colorscheme monokai
 
 " Generate backup files outside current dir
@@ -189,4 +316,4 @@ augroup END
 command! FormatJson execute "%!python -m json.tool"
 
 " Prettier command
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
+"command! -nargs=0 Prettier :CocCommand prettier.formatFile
