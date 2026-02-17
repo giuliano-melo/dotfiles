@@ -16,7 +16,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'Raimondi/delimitMate'
   Plug 'mattn/emmet-vim'
   Plug 'nathanaelkane/vim-indent-guides'
-  Plug 'bling/vim-airline'
+  Plug 'itchyny/lightline.vim'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
@@ -31,6 +31,34 @@ call plug#begin('~/.vim/plugged')
   Plug 'github/copilot.vim'
   Plug 'puremourning/vimspector'
 call plug#end()
+
+"--- lightline.vim configuration --------------------------------------
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified' ] ],
+      \   'right': [ [ 'lineinfo' ], [ 'percent' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+      \ },
+      \ 'separator': { 'left': ' ', 'right': ' ' },
+      \ 'subseparator': { 'left': ' ', 'right': ' ' }
+      \ }
+
+let g:lightline.tabline = {
+      \ 'left': [ [ 'tabnum' ] ],
+      \ 'right': [ ]
+      \ }
+
+function! LightlineTabnum()
+  let tabnum = tabpagenr()
+  let total = tabmanum("$")
+  return tabnum . '/' . total
+endfunction
+
+let g:lightline.component = {
+      \ 'tabnum': '%{LightlineTabnum()}'
+      \ }
+
+set showtabline=2
 
 "--- vim-lsp configuration ---------------------------------------------
 if executable('pylsp')
