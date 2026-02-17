@@ -20,8 +20,11 @@ call plug#begin('~/.vim/plugged')
   Plug 'nathanaelkane/vim-indent-guides'
   Plug 'bling/vim-airline'
   Plug 'editorconfig/editorconfig-vim'
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  Plug 'junegunn/fzf.vim'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-repeat'
   Plug 'ludovicchabant/vim-gutentags'
-  Plug 'ctrlpvim/ctrlp.vim'
   Plug 'sickill/vim-monokai'
   Plug 'dense-analysis/ale'
   Plug 'liuchengxu/vim-which-key'
@@ -210,6 +213,31 @@ command! VR :VimspectorReset
 let g:mapleader = "\\"
 nnoremap <silent> <leader> :<c-u>WhichKey '\'<CR>
 set timeoutlen=200
+
+"--- FZF settings ------------------------------------------------------
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-s': 'split',
+  \ 'ctrl-v': 'vsplit'
+  \ }
+let g:fzf_colors = {
+  \ 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'Normal'],
+  \ 'bg+':     ['bg', 'Normal'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment']
+  \ }
+nnoremap <leader>ff :Files<CR>
+nnoremap <leader>fg :Rg<CR>
+nnoremap <leader>fb :Buffers<CR>
+nnoremap <leader>fh :Helptags<CR>
 
 
 " Gutentags confs
