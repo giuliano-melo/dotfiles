@@ -11,7 +11,8 @@ set encoding=UTF-8
 nnoremap <leader>c :botright term<CR>
 
 call plug#begin('~/.vim/plugged')
-  Plug 'yegappan/lsp'
+  Plug 'prabirshrestha/async.vim'
+  Plug 'prabirshrestha/vim-lsp'
   Plug 'airblade/vim-gitgutter'
   Plug 'Raimondi/delimitMate'
   Plug 'sheerun/vim-polyglot'
@@ -27,20 +28,6 @@ call plug#begin('~/.vim/plugged')
   Plug 'vim-test/vim-test', {'requires': 'tpope/vim-dispatch'}
   Plug 'github/copilot.vim'
   Plug 'puremourning/vimspector'
-  "Plug 'nvie/vim-flake8'
-  "Plug 'neoclide/coc.nvim', {'branch': 'release'}
-  "Plug 'dracula/vim'
-  "Plug 'scrooloose/syntastic'
-  "Plug 'vim-ruby/vim-ruby'
-  "Plug 'tpope/vim-rails'
-  "Plug 'tpope/vim-bundler'
-  "Plug 'ngmy/vim-rubocop'
-  "Plug 'elzr/vim-json'
-  "Plug 'pangloss/vim-javascript'    " JavaScript support
-  "Plug 'leafgarland/typescript-vim' " TypeScript syntax
-  "Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
-  "Plug 'jparise/vim-graphql'        " GraphQL syntax
-  "Plug 'ianks/vim-tsx'              " TSX syntax
 call plug#end()
 
 "--- LSP settings ---------------------------------------------------"
