@@ -22,6 +22,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'junegunn/fzf.vim'
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-repeat'
+  Plug 'tpope/vim-unimpaired'
   Plug 'ludovicchabant/vim-gutentags'
   Plug 'sickill/vim-monokai'
   Plug 'dense-analysis/ale'
@@ -61,6 +62,8 @@ let g:lightline.component = {
 set showtabline=2
 
 "--- vim-lsp configuration ---------------------------------------------
+let g:lsp_use_native_client = 1
+
 if executable('pylsp')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'pylsp',
@@ -322,7 +325,7 @@ set backupdir=~/.tmp,~/tmp,/var/tmp,/tmp
 set backupskip=/tmp/*,/private/tmp/*
 set directory=~/.tmp,~/tmp,/var/tmp,/tmp
 
-" Python specific configs
+"--- Python specific configs ---------------------------------------------
 au BufNewFile,BufRead *.py
     \ set tabstop=4 |
     \ set softtabstop=4 |
