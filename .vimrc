@@ -17,6 +17,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'mattn/emmet-vim'
   Plug 'nathanaelkane/vim-indent-guides'
   Plug 'itchyny/lightline.vim'
+  Plug 'maximbaz/lightline-ale'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
@@ -42,7 +43,7 @@ let g:lightline = {
       \ 'colorscheme': 'powerline',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified' ] ],
-      \   'right': [ [ 'lineinfo' ], [ 'percent' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+      \   'right': [ [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ], [ 'lineinfo' ], [ 'percent' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
       \ },
       \ 'separator': { 'left': ' ', 'right': ' ' },
       \ 'subseparator': { 'left': ' ', 'right': ' ' }
@@ -61,6 +62,20 @@ endfunction
 
 let g:lightline.component = {
       \ 'tabnum': '%{LightlineTabnum()}'
+      \ }
+
+let g:lightline.component_expand = {
+      \ 'linter_checking': 'lightline#ale#checking',
+      \ 'linter_warnings': 'lightline#ale#warnings',
+      \ 'linter_errors': 'lightline#ale#errors',
+      \ 'linter_ok': 'lightline#ale#ok',
+      \ }
+
+let g:lightline.component_type = {
+      \ 'linter_checking': 'left',
+      \ 'linter_warnings': 'warning',
+      \ 'linter_errors': 'error',
+      \ 'linter_ok': 'left',
       \ }
 
 set showtabline=2
@@ -183,7 +198,13 @@ nmap <leader>Ra :Rails<CR>
 let g:ale_set_signs = 1
 let g:ale_set_highlights = 1
 let g:ale_virtualtext_cursor = 1
+
+"Custom error/warning symbols
+let g:ale_sign_error = '✗'
+let g:ale_sign_warning = '⚠'
+
 highlight ALEError ctermbg=none cterm=underline
+highlight ALEWarning ctermbg=none cterm=underline
 
 "Define when to lint"
 let g:ale_lint_on_save = 1
@@ -196,6 +217,10 @@ let g:ale_linters = {
     \ 'go': ['gofmt', 'gopls', 'govet', 'gobuild'],
     \ 'python': ['ruff', 'mypy', 'pylsp'],
     \ 'ruby': ['rubocop', 'ruby'],
+    \ 'javascript': ['eslint'],
+    \ 'typescript': ['eslint', 'tsserver'],
+    \ 'sh': ['shellcheck'],
+    \ 'dockerfile': ['hadolint'],
     \ }
 "Specify fixers for individual filetypes"
 let g:ale_fixers = {
@@ -203,6 +228,10 @@ let g:ale_fixers = {
     \ 'python': ['ruff'],
     \ 'ruby': ['rubocop', 'rufo'],
     \ 'go': ['gopls', 'goimports', 'gofmt', 'gotype', 'govet'],
+    \ 'javascript': ['eslint', 'prettier'],
+    \ 'typescript': ['eslint', 'prettier'],
+    \ 'json': ['jq', 'fixjson'],
+    \ 'sh': ['shfmt'],
     \ }
 "Don't warn about trailing whitespace, as it is auto-fixed by '*' above"
 let g:ale_warn_about_trailing_whitespace = 0
@@ -211,6 +240,13 @@ let g:ale_lsp_show_message_severity = 'information'
 let g:ale_echo_msg_format = '[%linter%] [%severity%:%code%] %s'
 "Specify Containerfiles as Dockerfiles"
 let g:ale_linter_aliases = {"Containerfile": "dockerfile"}
+
+"Navigation mappings for errors"
+nmap ]e <Plug>(ale_next_wrap)
+nmap [e <Plug>(ale_previous_wrap)
+
+"Toggle ALE"
+nnoremap <leader>at :ALEToggle<CR>
 
 "Mapping to run fixers on file"
 nnoremap <leader>L :ALEFix<CR>
