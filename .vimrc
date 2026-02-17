@@ -23,6 +23,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-unimpaired'
+  Plug 'mg979/vim-visual-multi', {'branch': 'master'}
   Plug 'ludovicchabant/vim-gutentags'
   Plug 'sickill/vim-monokai'
   Plug 'dense-analysis/ale'
