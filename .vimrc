@@ -42,7 +42,7 @@ colorscheme monokai
 let g:lightline = {
       \ 'colorscheme': 'powerline',
       \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified' ] ],
+      \   'left': [ [ 'mode', 'paste' ], [ 'readonly', 'filename', 'modified', 'gutentags' ] ],
       \   'right': [ [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ], [ 'lineinfo' ], [ 'percent' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
       \ },
       \ 'separator': { 'left': ' ', 'right': ' ' },
@@ -61,7 +61,8 @@ function! LightlineTabnum()
 endfunction
 
 let g:lightline.component = {
-      \ 'tabnum': '%{LightlineTabnum()}'
+      \ 'tabnum': '%{LightlineTabnum()}',
+      \ 'gutentags': '%{gutentags#statusline("[Generating...]")}'
       \ }
 
 let g:lightline.component_expand = {
@@ -313,7 +314,29 @@ nnoremap <leader>fh :Helptags<CR>
 
 
 "--- Gutentags confs ----------------------------------------------------
+"Cache directory for tags
 let g:gutentags_cache_dir = '~/.tags'
+
+"Auto-generation settings
+let g:gutentags_generate_on_new = 1
+let g:gutentags_generate_on_missing = 1
+let g:gutentags_generate_on_write = 1
+
+"Project root markers
+let g:gutentags_project_root = ['.git', '.hg', '.svn', 'package.json', 'Gemfile', 'go.mod', 'Cargo.toml', 'pyproject.toml']
+
+"CTags extra arguments
+let g:gutentags_ctags_extra_args = [
+      \ '--extras=+q',
+      \ '--exclude=@.gitignore',
+      \ '--fields=+l',
+      \ '--langmap=python:.py',
+      \ ]
+
+"Enable cscope module for C/C++ projects
+let g:gutentags_modules = ['ctags', 'cscope']
+
+"Exclude patterns
 let g:gutentags_ctags_exclude = [
       \ '*.git', '*.svg', '*.hg',
       \ '*/tests/*',
