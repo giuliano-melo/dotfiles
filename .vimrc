@@ -34,6 +34,9 @@ call plug#begin('~/.vim/plugged')
   Plug 'puremourning/vimspector'
 call plug#end()
 
+set t_Co=256
+colorscheme monokai
+
 "--- lightline.vim configuration --------------------------------------
 let g:lightline = {
       \ 'colorscheme': 'powerline',
@@ -61,6 +64,7 @@ let g:lightline.component = {
       \ }
 
 set showtabline=2
+set laststatus=2
 
 "--- vim-lsp configuration ---------------------------------------------
 let g:lsp_use_native_client = 1
