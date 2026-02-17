@@ -30,29 +30,46 @@ call plug#begin('~/.vim/plugged')
   Plug 'puremourning/vimspector'
 call plug#end()
 
-"--- LSP settings ---------------------------------------------------"
-let lspOptions = #{
-    \ aleSupport: v:true,
-    \ autoHighlight: v:true,
-    \ completionTextEdit: v:true,
-    \ noNewlineInCompletion: v:true,
-    \ outlineOnRight: v:true,
-    \ outlineWinSize: 70,
-    \ showDiagWithSign: v:false,
-    \ useQuickfixForLocations: v:true,
-    \ }
-autocmd VimEnter * call LspOptionsSet(lspOptions)
+"--- vim-lsp configuration ---------------------------------------------
+if executable('pylsp')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'pylsp',
+        \ 'cmd': {server_info->['pylsp']},
+        \ 'allowlist': ['python'],
+        \ })
+endif
 
-"    \ #{ name: 'gopls', filetype: ['go', 'gomod'],  path: 'gopls', args: ['serve'] },
-"    \ #{ name: 'rustlang', filetype: ['rust'], path: 'rust-analyzer', args: [], syncInit: v:true },
-let lspServers = [
-    \ #{ name: 'pylsp', filetype: ['py', 'python'], path: 'pylsp', args: []        },
-    \ #{ name: 'clangd', filetype: ['c', 'cpp'], path: 'clangd', args: ['--background-index']},
-    \ #{ name: 'tslang', filetype: ['javascript', 'typescript'], path: 'typescript-language-server', args: ['--stdio'] },
-\ ]
-autocmd VimEnter * call LspAddServer(lspServers)
+if executable('clangd')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'clangd',
+        \ 'cmd': {server_info->['clangd', '--background-index']},
+        \ 'allowlist': ['c', 'cpp'],
+        \ })
+endif
 
-"Enable auto selection of the fist autocomplete item"
+if executable('typescript-language-server')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'tsserver',
+        \ 'cmd': {server_info->['typescript-language-server', '--stdio']},
+        \ 'allowlist': ['javascript', 'typescript'],
+        \ })
+endif
+
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=yes
+    nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> K <plug>(lsp-hover)
+endfunction
+
+augroup lsp_install
+    au!
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
+"Enable auto selection of the first autocomplete item"
 augroup LspSetup
     au!
     au User LspAttached set completeopt-=noselect
@@ -60,17 +77,10 @@ augroup END
 "Disable newline on selecting completion option"
 inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<CR>"
 
-"Mappings for most-used functions"
-nnoremap <leader>i :LspHover<CR>
-nnoremap <leader>d :LspGotoDefinition<CR>
-nnoremap <leader>p :LspPeekDefinition<CR>
-nnoremap <leader>R :LspRename<CR>
-nnoremap <leader>r :LspPeekReferences<CR>
-nnoremap <leader>o :LspDocumentSymbol<CR>
+"Mappings for most-used functions are set in s:on_lsp_buffer_enabled()
 
 "--- ALE settings ------------------------------------------------------"
-"Disable ALE's LSP in favour of standalone LSP plugin"
-let g:ale_disable_lsp = 1
+"ALE now works alongside vim-lsp (vim-lsp handles LSP, ALE handles linting)
 
 "Show linting errors with highlights"
 "* Can also be viewed in the loclist with :lope"
