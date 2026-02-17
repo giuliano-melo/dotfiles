@@ -26,6 +26,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'dense-analysis/ale'
   Plug 'liuchengxu/vim-which-key'
   Plug 'vim-test/vim-test', {'requires': 'tpope/vim-dispatch'}
+  Plug 'tpope/vim-rails'
   Plug 'github/copilot.vim'
   Plug 'puremourning/vimspector'
 call plug#end()
@@ -55,6 +56,23 @@ if executable('typescript-language-server')
         \ })
 endif
 
+" Ruby LSP configuration (both ruby-lsp and solargraph)
+if executable('ruby-lsp')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'ruby-lsp',
+        \ 'cmd': {server_info->['ruby-lsp']},
+        \ 'allowlist': ['ruby', 'rake', 'erb', 'gemfile'],
+        \ })
+endif
+
+if executable('solargraph')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'solargraph',
+        \ 'cmd': {server_info->['solargraph', 'stdio']},
+        \ 'allowlist': ['ruby', 'rake', 'erb', 'gemfile'],
+        \ })
+endif
+
 function! s:on_lsp_buffer_enabled() abort
     setlocal omnifunc=lsp#complete
     setlocal signcolumn=yes
@@ -79,6 +97,47 @@ inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<CR>"
 
 "Mappings for most-used functions are set in s:on_lsp_buffer_enabled()
 
+"--- vim-rails configuration -------------------------------------------
+let g:rails_projections = {
+      \ "app/controllers/*_controller.rb": {
+      \   "command": "controller",
+      \   "test": "spec/controllers/",
+      \   "keywords": {
+      \     "skip_before_action": { "keyword": "before", "type": "filter" },
+      \     "before_action": { "keyword": "before", "type": "filter" }
+      \   }
+      \ },
+      \ "app/models/*.rb": {
+      \   "command": "model",
+      \   "test": "spec/models/"
+      \ },
+      \ "app/views/**/*.erb": {
+      \   "command": "view",
+      \   "test": "spec/views/",
+      \   "alternate": "spec/views/%s/_%f"
+      \ },
+      \ "config/routes.rb": {
+      \   "command": "routes",
+      \   "keywords": {
+      \     "get ": { "keyword": "route", "search": "config/routes.rb" },
+      \     "post ": { "keyword": "route", "search": "config/routes.rb" },
+      \     "put ": { "keyword": "route", "search": "config/routes.rb" },
+      \     "patch ": { "keyword": "route", "search": "config/routes.rb" },
+      \     "delete ": { "keyword": "route", "search": "config/routes.rb" }
+      \   }
+      \ },
+      \ "db/migrate/*.rb": {
+      \   "command": "migration",
+      \   "test": "spec/migrations/"
+      \ },
+      \ "spec/*_spec.rb": {
+      \   "command": "spec",
+      \   "alternate": "app/%s"
+      \ }
+      \ }
+
+nmap <leader>Ra :Rails<CR>
+
 "--- ALE settings ------------------------------------------------------"
 "ALE now works alongside vim-lsp (vim-lsp handles LSP, ALE handles linting)
 
@@ -99,13 +158,15 @@ let g:ale_linters_explicit = 1
 let g:ale_linters = {
     \ 'go': ['gofmt', 'gopls', 'govet', 'gobuild'],
     \ 'python': ['ruff', 'mypy', 'pylsp'],
-\ }
+    \ 'ruby': ['rubocop', 'ruby'],
+    \ }
 "Specify fixers for individual filetypes"
 let g:ale_fixers = {
     \ '*': ['trim_whitespace'],
     \ 'python': ['ruff'],
+    \ 'ruby': ['rubocop', 'rufo'],
     \ 'go': ['gopls', 'goimports', 'gofmt', 'gotype', 'govet'],
-\ }
+    \ }
 "Don't warn about trailing whitespace, as it is auto-fixed by '*' above"
 let g:ale_warn_about_trailing_whitespace = 0
 "Show info, warnings, and errors; Write which linter produced the message"
