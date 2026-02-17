@@ -5,7 +5,6 @@ syntax on
 filetype  plugin indent on
 
 set hlsearch incsearch ignorecase
-set number relativenumber
 set encoding=UTF-8
 
 nnoremap <leader>c :botright term<CR>
@@ -15,7 +14,6 @@ call plug#begin('~/.vim/plugged')
   Plug 'prabirshrestha/vim-lsp'
   Plug 'airblade/vim-gitgutter'
   Plug 'Raimondi/delimitMate'
-  Plug 'sheerun/vim-polyglot'
   Plug 'mattn/emmet-vim'
   Plug 'nathanaelkane/vim-indent-guides'
   Plug 'bling/vim-airline'
@@ -291,16 +289,10 @@ let g:gutentags_ctags_exclude = [
       \ '*.pdf', '*.doc', '*.docx', '*.ppt', '*.pptx',
       \ ]
 
-set t_Co=256
-colorscheme monokai
-
 " Generate backup files outside current dir
 set backupdir=~/.tmp,~/tmp,/var/tmp,/tmp
 set backupskip=/tmp/*,/private/tmp/*
 set directory=~/.tmp,~/tmp,/var/tmp,/tmp
-
-" Remove trailing whitespaces
-autocmd BufWritePre * :%s/\s\+$//e
 
 " Python specific configs
 au BufNewFile,BufRead *.py
