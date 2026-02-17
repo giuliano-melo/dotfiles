@@ -1,0 +1,18 @@
+# AI agent instructions
+AGENTS.md
+
+# Vim swap files
+*.swp
+*.swo
+*~
+
+# Tags
+.tags/
+tags
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor backup files
+*.bak
