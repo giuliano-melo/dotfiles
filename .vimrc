@@ -225,6 +225,7 @@ let g:copilot_filetypes = {
   \ 'javascript': v:true,
   \ 'typescript': v:true,
   \ 'ruby': v:true,
+  \ 'go': v:true,
   \ 'cpp': v:true,
   \ 'c': v:true,
   \ }
@@ -335,11 +336,11 @@ au BufNewFile,BufRead *.py
     \ set autoindent |
     \ set fileformat=unix |
 
-" Autoreload .vimrc
+"--- Autoreload .vimrc ----------------------------------------------------
 augroup myvimrc
     au!
     au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
 augroup END
 
-" Format JSON files
+"--- Format JSON files ----------------------------------------------------
 command! FormatJson execute "%!python -m json.tool"
