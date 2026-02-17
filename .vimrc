@@ -50,7 +50,7 @@ let g:lightline.tabline = {
 
 function! LightlineTabnum()
   let tabnum = tabpagenr()
-  let total = tabmanum("$")
+  let total = tabpagenr("$")
   return tabnum . '/' . total
 endfunction
 
@@ -221,6 +221,7 @@ let g:copilot_filetypes = {
   \ 'python': v:true,
   \ 'javascript': v:true,
   \ 'typescript': v:true,
+  \ 'ruby': v:true,
   \ 'cpp': v:true,
   \ 'c': v:true,
   \ }
@@ -266,9 +267,8 @@ nnoremap <leader>fb :Buffers<CR>
 nnoremap <leader>fh :Helptags<CR>
 
 
-" Gutentags confs
+"--- Gutentags confs ----------------------------------------------------
 let g:gutentags_cache_dir = '~/.tags'
-set statusline+=%{gutentags#statusline()}
 let g:gutentags_ctags_exclude = [
       \ '*.git', '*.svg', '*.hg',
       \ '*/tests/*',
@@ -317,7 +317,7 @@ let g:gutentags_ctags_exclude = [
       \ '*.pdf', '*.doc', '*.docx', '*.ppt', '*.pptx',
       \ ]
 
-" Generate backup files outside current dir
+"--- Backup and swap file settings ------------------------------------
 set backupdir=~/.tmp,~/tmp,/var/tmp,/tmp
 set backupskip=/tmp/*,/private/tmp/*
 set directory=~/.tmp,~/tmp,/var/tmp,/tmp
