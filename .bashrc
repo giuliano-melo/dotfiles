@@ -1,32 +1,3 @@
-# Bash eternal history
-# --------------------
-# This snippet allows infinite recording of every command you've ever
-# entered on the machine, without using a large HISTFILESIZE variable,
-# and keeps track if you have multiple screens and ssh sessions into the
-# same machine. It is adapted from:
-# http://www.debian-administration.org/articles/543.
-#
-# The way it works is that after each command is executed and
-# before a prompt is displayed, a line with the last command (and
-# some metadata) is appended to ~/.bash_eternal_history.
-#
-# This file is a tab-delimited, timestamped file, with the following
-# columns:
-#
-# 1) user
-# 2) hostname
-# 3) screen window (in case you are using GNU screen)
-# 4) date/time
-# 5) current working directory (to see where a command was executed)
-# 6) the last command you executed
-#
-# The only minor bug: if you include a literal newline or tab (e.g. with
-# awk -F"\t"), then that will be included verbatime. It is possible to
-# define a bash function which escapes the string before writing it; if you
-# have a fix for that which doesn't slow the command down, please submit
-# a patch or pull request.
-PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND ; }"'echo -e $$\\t$USER\\t$HOSTNAME\\tscreen $WINDOW\\t$(date +%D%t%T%t%Y%t%s)\\t$PWD"$(history 1)" >> ~/.bash_eternal_history'
-
 # Append to history
 # See: http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html
 shopt -s histappend
