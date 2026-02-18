@@ -10,14 +10,6 @@ setopt HIST_FIND_NO_DUPS
 setopt HIST_SAVE_NO_DUPS
 setopt HIST_BEEP
 
-# Bash eternal history equivalent
-BASH_ETERNAL_HISTORY="${HOME}/.zsh_eternal_history"
-autoload -U add-zsh-hook
-__eternal_history() {
-    print -r -- "$1" >> "$BASH_ETERNAL_HISTORY"
-}
-add-zsh-hook preexec __eternal_history
-
 # Enable completion
 autoload -Uz compinit
 compinit
@@ -131,4 +123,4 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 # enable FZF
-#eval "$(fzf --zsh)"
+eval "$(fzf --zsh)"
