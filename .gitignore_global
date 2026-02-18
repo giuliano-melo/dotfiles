@@ -1,0 +1,69 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.temp
+
+# Editor directories and files
+.idea/
+.vscode/
+*.code-workspace
+
+# Tags files
+tags
+cscope.*
+
+# Build outputs
+dist/
+build/
+*.o
+*.so
+*.a
+
+# Package manager files
+node_modules/
+vendor/
+bower_components/
+bundle/
+
+# Backup files
+*backup*
+*backup~*
+
+# Archive formats
+*.zip
+*.tar.gz
+*.tar
+*.rar
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+
+# Ruby
+*.gem
+.bundle/
+
+# Go
+vendor/
+
+# Rust
+target/
+
+# Backup directory (used by install.sh)
+.dotfiles_backup_*/
