@@ -10,12 +10,9 @@
 # Allow all inbound traffic
 -P OUTPUT  ACCEPT
 
-# log iptables denied calls (access via dmesg)
--A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables denied: " --log-level 7
-
-# Reject ALL inbound
--P INPUT  DROP
--P FORWARD DROP
+# Rate limiting for connection floods
+-A INPUT -p tcp --tcp-flags ALL NONE -m limit --limit 5/min --limit-burst 3 -j DROP
+-A INPUT -p tcp --tcp-flags ALL ALL -m limit --limit 5/min --limit-burst 3 -j DROP
 
 # Arp Spoofing
 -N spoofing
@@ -24,6 +21,13 @@
 
 -A INPUT -s 255.0.0.0/8 -j spoofing
 -A INPUT -s 0.0.0.0/8 -j spoofing
+
+# log iptables denied calls (access via dmesg)
+-A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables denied: " --log-level 7
+
+# Reject ALL inbound
+-P INPUT  DROP
+-P FORWARD DROP
 
 COMMIT
 

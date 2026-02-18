@@ -1,0 +1,41 @@
+#!/usr/sbin/nft -f
+
+# Flush existing rules
+flush ruleset
+
+table inet filter {
+    chain input {
+        # Allow all loopback(lo0) and drop all traffic to 127/8 that don't use lo0
+        iif "lo" accept
+        iif != "lo" ip daddr 127.0.0.0/8 reject
+
+        # Accept all established inbound connections
+        ct state established,related accept
+
+        # Rate limiting for connection floods
+        # Block NULL flags packets (potential reconnaissance)
+        tcp flags & (fin|syn|rst|psh|ack|urg) == 0 limit rate 3/minute burst 3 packets drop
+        # Block SYN+FIN packets (potential scan/evasion)
+        tcp flags & (fin|syn) == (fin|syn) limit rate 3/minute burst 3 packets drop
+
+        # ARP spoofing protection
+        # Log and drop traffic from invalid source addresses
+        ip saddr 0.0.0.0/8 log prefix "Spoofed source IP: " drop
+
+        # Log unmatched packets (before final drop)
+        limit rate 3/minute burst 3 packets log prefix "iptables denied: "
+
+        # Reject ALL inbound
+        reject
+    }
+
+    chain forward {
+        # Drop all forwarded traffic
+        drop
+    }
+
+    chain output {
+        # Allow all outbound traffic
+        policy accept
+    }
+}
