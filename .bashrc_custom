@@ -1,4 +1,6 @@
-source ~/Dev/dotfiles/.bash/prompt.sh
+SOURCE="${BASH_SOURCE[0]}"
+DIR="$( dirname "$SOURCE" )"
+source "$DIR/.bash/prompt.sh"
 
 alias lss='lsof -Pnl +M -i4 -i6'
 alias ls-servers='netstat -tulpn'
@@ -12,6 +14,11 @@ export DEVHOME=$HOME/dev
 # and everytime you enter this dir GOPATH and GOBIN
 # will be automatically be set
 export GOPATH=$HOME/dev/go
+
+case $- in
+    *i*) ;;
+    *) return ;;
+esac
 
 function cd() {
     builtin cd "$@"
@@ -39,5 +46,5 @@ function cd() {
 #}
 
 generate_uuid() {
-    echo $(cat /proc/sys/kernel/random/uuid)
+    cat /proc/sys/kernel/random/uuid
 }

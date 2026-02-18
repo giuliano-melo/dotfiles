@@ -25,7 +25,7 @@
 # define a bash function which escapes the string before writing it; if you
 # have a fix for that which doesn't slow the command down, please submit
 # a patch or pull request.
-PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND ; }"'echo -e $$\\t$USER\\t$HOSTNAME\\tscreen $WINDOW\\t`date +%D%t%T%t%Y%t%s`\\t$PWD"$(history 1)" >> ~/.bash_eternal_history'
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND ; }"'echo -e $$\\t$USER\\t$HOSTNAME\\tscreen $WINDOW\\t$(date +%D%t%T%t%Y%t%s)\\t$PWD"$(history 1)" >> ~/.bash_eternal_history'
 
 # Append to history
 # See: http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html
@@ -72,16 +72,16 @@ DIR="$( dirname "$SOURCE" )"
 
 ## Define any user-specific variables you want here.
 CUSTOM_BASHRC="$DIR/.bashrc_custom"
-if [ -f $CUSTOM_BASHRC ]; then
+if [ -f "$CUSTOM_BASHRC" ]; then
   . $CUSTOM_BASHRC
 fi
 
 BASH_COMPLETION_SCRIPT="$DIR/.git-completion.bash"
-if [ -f $BASH_COMPLETION_SCRIPT ]; then
+if [ -f "$BASH_COMPLETION_SCRIPT" ]; then
   . $BASH_COMPLETION_SCRIPT
 fi
 
-if [ -t direnv ]; then
+if command -v direnv &>/dev/null; then
   eval "$(direnv hook bash)"
 fi
 
