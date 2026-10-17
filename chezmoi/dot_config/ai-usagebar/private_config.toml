@@ -1,0 +1,19 @@
+# Personal preferences only. API keys and OAuth credentials stay outside Git.
+[ollama]
+enabled = true
+api_key_env = "OLLAMA_API_KEY"
+plan = "pro"
+
+[anthropic]
+enabled = false
+api_key_env="CLAUDE_CODE_OAUTH_TOKEN"
+
+[openrouter]
+enabled = false
+
+[zai]
+enabled = false
+
+[kimi]
+enabled = true
+api_key_env = "KIMI_API_KEY"

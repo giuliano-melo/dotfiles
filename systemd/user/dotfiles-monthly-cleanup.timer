@@ -1,0 +1,11 @@
+[Unit]
+Description=Run conservative dotfiles cleanup monthly
+
+[Timer]
+OnCalendar=*-*-01 03:30:00
+Persistent=true
+RandomizedDelaySec=1h
+Unit=dotfiles-monthly-cleanup.service
+
+[Install]
+WantedBy=timers.target

@@ -124,3 +124,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # enable FZF
 eval "$(fzf --zsh)"
+
+# dotfiles: managed AI launchers (optional, configured by setup.sh ai configure)
+[[ ! -f "$HOME/.config/ai-stack/ai-stack.zsh" ]] || source "$HOME/.config/ai-stack/ai-stack.zsh"

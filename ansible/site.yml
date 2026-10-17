@@ -1,0 +1,59 @@
+---
+- name: Prepare a supported Linux workstation for dotfiles and AI CLIs
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: true
+
+  vars:
+    packages_by_family:
+      Debian:
+        - bubblewrap
+        - ca-certificates
+        - curl
+        - git
+        - glab
+        - python3
+        - zsh
+        - cargo
+      RedHat:
+        - bubblewrap
+        - ca-certificates
+        - curl
+        - git
+        - glab
+        - python3
+        - zsh
+        - cargo
+      Archlinux:
+        - bubblewrap
+        - ca-certificates
+        - curl
+        - git
+        - glab
+        - python
+        - zsh
+        - cargo
+
+  tasks:
+    - name: Require a supported package family
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family in packages_by_family
+          - ansible_distribution in ['Ubuntu', 'Debian', 'Fedora', 'Archlinux', 'Manjaro', 'EndeavourOS']
+        fail_msg: >-
+          Supported distributions are Debian, Ubuntu, Fedora, Arch Linux, Manjaro,
+          and EndeavourOS.
+          Detected {{ ansible_distribution }} ({{ ansible_os_family }}).
+
+    - name: Install host prerequisites without upgrading the OS
+      ansible.builtin.package:
+        name: "{{ packages_by_family[ansible_os_family] }}"
+        state: present
+
+    - name: Explain nested user namespace requirements
+      ansible.builtin.debug:
+        msg: >-
+          ai-jail needs working unprivileged user namespaces and bubblewrap.
+          This playbook deliberately does not change sysctls, AppArmor, SELinux,
+          or firewall policy. Validate the sandbox after provisioning.

@@ -1,0 +1,17 @@
+# Entries include subdomains. Do not add broad parent domains unnecessarily.
+# Model APIs and token refresh (not telemetry).
+api.openai.com
+auth.openai.com
+chatgpt.com
+api.kimi.ai
+auth.kimi.ai
+api.githubcopilot.com
+api.github.com
+ollama.com
+# Remote MCPs and HTTPS GitLab Git/API/credential use.
+gitlab.com
+mcp.datadoghq.com
+mcp.notion.com
+mcp.linear.app
+# Add additional OAuth discovery/refresh hosts only after observing a failure.
+# Registries and arbitrary web browsing are deliberately not enabled.

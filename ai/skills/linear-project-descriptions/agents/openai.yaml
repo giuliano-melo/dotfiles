@@ -1,0 +1,14 @@
+interface:
+  display_name: linear project descriptions
+  short_description: Draft, refine, and standardize Linear projects, initiatives,
+    subinitiatives, and related fields. Use when the user asks to create, update,
+    structure, or normalize Linear planning items and their descriptions.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

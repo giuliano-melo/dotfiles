@@ -1,0 +1,10 @@
+[Unit]
+Description=Conservative monthly Docker and Git cleanup
+Documentation=file:%h/Dev/dotfiles/scripts/cleanup-system.sh
+
+[Service]
+Type=oneshot
+ExecStart=%h/Dev/dotfiles/scripts/cleanup-system.sh --apply
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=1h
