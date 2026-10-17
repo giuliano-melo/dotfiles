@@ -94,6 +94,38 @@ class StackTests(unittest.TestCase):
       with self.assertRaisesRegex(RuntimeError, "Start inside"):
         stack.launch_command("codex", [])
 
+  def test_launch_here_maps_only_the_current_directory(self):
+    workspace = self.put("OtherProject/README.md", "project")
+    self.put(".config/ai-stack/gitconfig", "# test")
+    native = self.put(".local/share/ai-memory/native-runner/ai-memory", "native")
+    tool = self.put(".local/bin/codex", "native")
+    with patch.object(stack.Path, "cwd", return_value=workspace.parent), \
+         patch.object(stack, "native_memory", return_value=native), \
+         patch.object(stack.shutil, "which", side_effect=lambda name: str(tool) if name == "codex" else ("/usr/bin/ai-jail" if name == "ai-jail" else None)):
+      command = stack.launch_command("codex", [], here=True)
+    rw_maps = [command[index + 1] for index, item in enumerate(command[:-1]) if item == "--rw-map"]
+    self.assertEqual(rw_maps, [str(workspace.parent)])
+    self.assertIn("--no-network", command)
+    self.assertIn("--require-server", command)
+    self.assertNotIn(str(stack.ROOTS[0]), command)
+    self.assertNotIn(str(stack.ROOTS[1]), command)
+
+  def test_launch_here_rejects_home_and_broad_parents(self):
+    for broad in [stack.HOME, stack.HOME.parent, stack.HOME / "Dev", Path("/tmp"), Path("/usr")]:
+      with patch.object(stack.Path, "cwd", return_value=broad):
+        with self.assertRaisesRegex(RuntimeError, "jail-here refuses"):
+          stack.launch_command("codex", [], here=True)
+
+  def test_launch_here_cli_action_uses_current_directory_mode(self):
+    import sys
+    with patch.object(sys, "argv", ["ai-stack.py", "launch-here", "--dry-run", "kimi", "--fresh"]), \
+         patch.object(stack, "launch_command", return_value=["fake-ai-jail"]) as launch, \
+         patch.object(stack, "exec_or_preview") as execute:
+      stack.main()
+    launch.assert_called_once_with("kimi", ["--fresh"], here=True)
+    execute.assert_called_once_with(["fake-ai-jail"])
+    self.assertTrue(stack.DRY)
+
   def test_launch_retains_arguments_and_no_unrestricted_network(self):
     for root in stack.ROOTS:
       root.mkdir(parents=True)

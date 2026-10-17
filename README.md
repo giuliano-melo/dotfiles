@@ -52,6 +52,9 @@ files. It does not deploy the legacy firewall rule files.
 
 The AI launcher and harness-specific configuration remain in the focused
 `setup.sh ai ...` helpers; they are not replaced by chezmoi or Ansible.
+After configuring the AI launchers, use `jail-here <codex|kimi|opencode2>` from
+a specific project outside the default workspaces when you explicitly want to
+make only the current directory writable.
 
 ## Monthly cleanup
 

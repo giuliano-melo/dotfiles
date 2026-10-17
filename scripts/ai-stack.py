@@ -493,15 +493,25 @@ def server(args):
   run([native_memory(), "setup", "--agent", "codex", "--agent", "kimi-code", "--agent", "opencode2"])
 
 
-def launch_command(harness, native_args):
+def launch_command(harness, native_args, here=False):
   if platform.system() != "Linux":
     fail("Managed sandbox launcher currently targets Linux")
   cwd = Path.cwd().resolve()
-  roots = [root.resolve(strict=True) for root in ROOTS]
-  if any(root == HOME or root in HOME.parents for root in roots):
-    fail("Workspace resolves to HOME or an ancestor; refusing broad writable access")
-  if not any(cwd == root or root in cwd.parents for root in roots):
-    fail("Start inside ~/Dev/sympla or ~/Documents/gcrm/Linear (or a subdirectory), never HOME")
+  if here:
+    broad_paths = {Path("/"), Path("/tmp"), Path("/var"), Path("/usr"), Path("/etc"),
+                   Path("/opt"), Path("/mnt"), Path("/media"), Path("/run"),
+                   Path("/proc"), Path("/sys"), Path("/dev"), HOME}
+    if cwd in broad_paths or cwd in HOME.parents:
+      fail("jail-here refuses HOME, its ancestors, and broad system directories; choose a specific project directory")
+    if any(cwd == root or cwd in root.parents for root in ROOTS):
+      fail("jail-here refuses a parent of a configured workspace; choose a specific project directory")
+    roots = [cwd]
+  else:
+    roots = [root.resolve(strict=True) for root in ROOTS]
+    if any(root == HOME or root in HOME.parents for root in roots):
+      fail("Workspace resolves to HOME or an ancestor; refusing broad writable access")
+    if not any(cwd == root or root in cwd.parents for root in roots):
+      fail("Start inside ~/Dev/sympla or ~/Documents/gcrm/Linear (or a subdirectory), never HOME")
   harness = "opencode" if harness == "opencode2" else harness
   native = native_memory()
   tool = shutil.which(harness)
@@ -750,6 +760,10 @@ def main():
   item.add_argument("--dry-run", action="store_true")
   item.add_argument("harness", choices=["codex", "kimi", "opencode", "opencode2"])
   item.add_argument("native_args", nargs=argparse.REMAINDER)
+  item = sub.add_parser("launch-here", help="Launch with only the current directory writable")
+  item.add_argument("--dry-run", action="store_true")
+  item.add_argument("harness", choices=["codex", "kimi", "opencode", "opencode2"])
+  item.add_argument("native_args", nargs=argparse.REMAINDER)
   item = sub.add_parser("probe", help="Live filesystem/network checks without starting a model")
   item.add_argument("--dry-run", action="store_true")
   item.add_argument("--auth", action="store_true")
@@ -759,8 +773,8 @@ def main():
   if args.action == "probe":
     probe(args)
     return
-  if args.action == "launch":
-    cmd = launch_command(args.harness, args.native_args)
+  if args.action in {"launch", "launch-here"}:
+    cmd = launch_command(args.harness, args.native_args, here=args.action == "launch-here")
     exec_or_preview(cmd)
     return
   if args.action == "configure":

@@ -104,6 +104,9 @@ codex
 kimi --fresh
 opencode2
 jail opencode --prompt 'Review this repository'
+jail-here codex
+jail-here kimi --fresh
+jail-here opencode2
 jail-spec codex
 jail-code kimi
 ```
@@ -113,13 +116,22 @@ available with `command`; these convenience functions are not system-wide
 enforcement. Invocations from editors, desktop apps, absolute paths, and other
 shells must explicitly use the managed launcher to obtain the same protections.
 
-The launcher rejects working directories outside the two workspace roots,
-including HOME. Both roots remain writable in every session. It exposes only
-the active harness's persistent state, ai-memory client state, read-only skills
-and Git/glab config, and required runtime binaries. Docker, SSH, full inherited
-environment, systemd-user IPC, raw terminal passthrough, and automatic registry
-egress are off. OpenCode always runs a **private server inside the jail**;
-connecting it to an explicit host server is refused.
+For a project outside those two roots, `jail-here <harness>` opts into using only
+the current directory as the writable workspace. For example, `cd` to a specific
+project first, then run `jail-here codex`, `jail-here kimi`, or
+`jail-here opencode2`. It keeps the same ai-jail → ai-memory → CLI launch path
+and network/credential restrictions. It refuses HOME, its ancestors, broad
+system directories, and parent directories of the configured workspaces. Regular
+`codex`, `kimi`, `opencode2`, and `jail` commands remain restricted to the
+existing roots.
+
+The regular launcher rejects working directories outside the two workspace
+roots, including HOME. Both roots remain writable in regular launches. It
+exposes only the active harness's persistent state, ai-memory client state,
+read-only skills and Git/glab config, and required runtime binaries. Docker, SSH,
+full inherited environment, systemd-user IPC, raw terminal passthrough, and
+automatic registry egress are off. OpenCode always runs a **private server inside
+the jail**; connecting it to an explicit host server is refused.
 
 Writable ai-memory client caches/spools live in
 `~/.local/share/ai-stack/memory`, separate from the read-only native runner and

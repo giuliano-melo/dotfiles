@@ -10,10 +10,13 @@ path=("${HOME}/.local/bin" "${HOME}/.kimi-code/bin" "${path[@]}")
 export PATH
 
 if [[ -f "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" ]]; then
-  unalias jail jail-spec jail-code codex kimi opencode opencode2 2>/dev/null
+  unalias jail jail-here jail-spec jail-code codex kimi opencode opencode2 2>/dev/null
 
   jail() {
     bash "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" launch "$@"
+  }
+  jail-here() {
+    bash "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" launch-here "$@"
   }
   codex() { jail codex "$@"; }
   kimi() { jail kimi "$@"; }

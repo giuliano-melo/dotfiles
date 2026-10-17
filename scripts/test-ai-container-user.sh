@@ -67,5 +67,5 @@ assert (home / '.config/ai-usagebar/config.toml').read_bytes() == (home / 'Dev/d
 assert len(list((home / '.local/state/dotfiles/backups').iterdir())) == 1
 print('PASS: chezmoi deployment, private mode, conflict backups, nvm/Node, AI tools/hooks, launch previews, and idempotence')
 PY
-zsh -fc 'source ~/.zshrc; whence -w nvm jail codex kimi opencode2; nvm --version'
+zsh -fc 'source ~/.zshrc; whence -w nvm jail jail-here codex kimi opencode2; nvm --version'
 echo 'Not tested here: systemd, nested bubblewrap, provider/MCP authentication.'
