@@ -521,7 +521,16 @@ def launch_command(harness, native_args, here=False):
   tool = Path(tool).resolve()
   flags = [jail, "--private-home", "--no-agent-state", "--no-network", "--no-inherit-env",
            "--no-ssh", "--no-docker", "--no-systemd-user", "--no-toolchains", "--no-mise",
-           "--no-terminal-passthrough", "--no-save-config", "--forward-port", "49374"]
+           "--no-save-config", "--forward-port", "49374"]
+  if harness == "opencode":
+    # OpenCode's TUI copies through OSC 52 clipboard sequences, which ai-jail's
+    # PTY proxy filters unless raw terminal passthrough is on. Enable it
+    # explicitly: ai-jail command tables cannot select this, because the
+    # jailed argv starts with /usr/bin/env, not the harness name.
+    flags.append("--terminal-passthrough")
+  else:
+    # Codex and Kimi keep raw terminal passthrough disabled.
+    flags.append("--no-terminal-passthrough")
   # Forward names only, never literal secret values in argv or tracked config.
   # glab's active credential may be in the host environment rather than YAML.
   if os.environ.get("GITLAB_TOKEN"):

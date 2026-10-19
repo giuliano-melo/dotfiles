@@ -107,6 +107,8 @@ class StackTests(unittest.TestCase):
     self.assertEqual(rw_maps, [str(workspace.parent)])
     self.assertIn("--no-network", command)
     self.assertIn("--require-server", command)
+    self.assertIn("--no-terminal-passthrough", command)
+    self.assertNotIn("--display", command)
     self.assertNotIn(str(stack.ROOTS[0]), command)
     self.assertNotIn(str(stack.ROOTS[1]), command)
 
@@ -138,6 +140,9 @@ class StackTests(unittest.TestCase):
       self.assertIn("--no-network", command)
       self.assertNotIn("--network", command)
       self.assertNotIn("--ssh", command)
+      self.assertNotIn("--no-terminal-passthrough", command)
+      self.assertIn("--terminal-passthrough", command)
+      self.assertNotIn("--display", command)
       self.assertIn("--require-server", command)
       self.assertEqual(command[-4:], ["--standalone", "--prompt", "keep this argument", "--fresh"])
       with self.assertRaisesRegex(RuntimeError, "--server"):
