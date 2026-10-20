@@ -567,6 +567,12 @@ def launch_command(harness, native_args, here=False):
     # otherwise an RO bin/ map would cause ai-jail to drop the entire RW state.
     jail_tool = Path("/tmp/.ai-stack-kimi")
     flags += ["--map", f"{tool}:{jail_tool}", "--deny-path", str(tool.parent)]
+  elif harness == "codex" and HOME / ".codex" in tool.parents:
+    # Codex's self-contained standalone binary lives under ~/.codex, which is
+    # also its writable state root. Avoid overlapping RO/RW maps by exposing
+    # the executable at a separate RO path and denying the original bin path.
+    jail_tool = Path("/tmp/.ai-stack-codex")
+    flags += ["--map", f"{tool}:{jail_tool}", "--deny-path", str(tool.parent)]
   else:
     mount(tool.parent)
   if "node_modules" in tool.parts:
@@ -577,7 +583,7 @@ def launch_command(harness, native_args, here=False):
     mount(Path(*tool.parts[:length]))
   mount(CONFIG)
   mount(REPO / "ai/skills")
-  # Codex's npm launcher needs both Node and its complete installed package.
+  # Codex now ships as a standalone binary and does not need Node or node_modules.
   node = shutil.which("node")
   if node:
     node = Path(node).resolve()
@@ -608,6 +614,11 @@ def launch_command(harness, native_args, here=False):
     if any(arg == "--server" or arg.startswith("--server=") for arg in native_args):
       fail("--server is not allowed in managed launches; use the private server")
     native_args = ["--standalone", *native_args]
+  if harness == "codex":
+    # Codex's background daemon cannot persist inside the jail's tmpfs home. Force
+    # the self-contained mode so it runs without the shared background server.
+    if "--no-daemon" not in native_args:
+      native_args = ["--no-daemon", *native_args]
   return flags + ["--", "/usr/bin/env", *env, "/bin/sh", "/tmp/.ai-stack-entry.sh", str(native), "run", "--require-server", "--no-autowire",
                   "--executable", str(jail_tool), harness, *native_args]
 

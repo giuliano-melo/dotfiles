@@ -11,6 +11,8 @@ ollama.com
 # Remote MCPs and HTTPS GitLab Git/API/credential use.
 gitlab.com
 mcp.datadoghq.com
+# Datadog OAuth token refresh endpoint (observed in jailed OpenCode MCP sessions).
+app.datadoghq.com
 mcp.notion.com
 mcp.linear.app
 # Add additional OAuth discovery/refresh hosts only after observing a failure.

@@ -171,13 +171,36 @@ class StackTests(unittest.TestCase):
       root.mkdir(parents=True)
     self.put(".config/ai-stack/gitconfig", "# test")
     native = self.put(".local/share/ai-memory/native-runner/ai-memory", "native")
-    tool = self.put(".local/bin/codex", "native")
+    tool = self.put(".codex/packages/standalone/releases/0.163.0/bin/codex", "native")
     with patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), patch.object(stack, "native_memory", return_value=native), patch.object(stack.shutil, "which", side_effect=lambda name: str(tool) if name == "codex" else ("/usr/bin/ai-jail" if name == "ai-jail" else None)), patch.dict(os.environ, {"GITLAB_TOKEN": "test-secret-never-on-argv", "UNRELATED_SECRET": "do-not-forward"}):
       command = stack.launch_command("codex", [])
     self.assertIn("GITLAB_TOKEN", command)
     self.assertNotIn("test-secret-never-on-argv", command)
     self.assertNotIn("UNRELATED_SECRET", command)
     self.assertNotIn("do-not-forward", command)
+    self.assertNotIn(tool.parent, command)
+    self.assertIn("/tmp/.ai-stack-codex", command)
+    self.assertIn("--deny-path", command)
+    self.assertIn("--no-daemon", command)
+
+  def test_codex_standalone_mount_avoids_overlap_and_forces_no_daemon(self):
+    for root in stack.ROOTS:
+      root.mkdir(parents=True)
+    self.put(".config/ai-stack/gitconfig", "# test")
+    native = self.put(".local/share/ai-memory/native-runner/ai-memory", "native")
+    tool = self.put(".codex/packages/standalone/releases/0.163.0/bin/codex", "native")
+    with patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), \
+         patch.object(stack, "native_memory", return_value=native), \
+         patch.object(stack.shutil, "which", side_effect=lambda name: str(tool) if name == "codex" else ("/usr/bin/ai-jail" if name == "ai-jail" else None)):
+      command = stack.launch_command("codex", [])
+    self.assertNotIn(tool.parent, command)
+    self.assertIn("/tmp/.ai-stack-codex", command)
+    self.assertIn("--deny-path", command)
+    self.assertIn("--no-daemon", command)
+    # Make sure the legacy npm node_modules mount is not forced for Codex.
+    self.assertNotIn("node_modules", " ".join(command))
+    # Node may still be mapped for OpenCode; here we only assert Codex itself.
+    self.assertIn(str(stack.ROOTS[0]), command)
 
   def test_probe_executes_env_after_the_entry_script(self):
     from types import SimpleNamespace

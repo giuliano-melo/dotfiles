@@ -133,6 +133,12 @@ not the harness name. Codex and Kimi explicitly keep passthrough disabled. Raw
 passthrough exposes terminal escape/query behavior to programs in the OpenCode
 jail; that trade-off is accepted there for clipboard support.
 
+Codex is now a self-contained standalone binary installed under `~/.codex`. The
+managed launcher exposes the executable at a read-only path outside that writable
+state tree and denies the original `bin` directory, avoiding overlapping mount
+warnings. It also passes `--no-daemon` so Codex does not try to use a
+persisting background server inside the jail's fresh tmpfs home.
+
 The regular launcher rejects working directories outside the two workspace
 roots, including HOME. Both roots remain writable in regular launches. It
 exposes only the active harness's persistent state, ai-memory client state,
