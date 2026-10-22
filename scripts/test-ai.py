@@ -105,9 +105,11 @@ class StackTests(unittest.TestCase):
       command = stack.launch_command("codex", [], here=True)
     rw_maps = [command[index + 1] for index, item in enumerate(command[:-1]) if item == "--rw-map"]
     self.assertEqual(rw_maps, [str(workspace.parent)])
-    self.assertIn("--no-network", command)
+    self.assertIn("--network", command)
+    self.assertNotIn("--no-network", command)
     self.assertIn("--require-server", command)
-    self.assertIn("--no-terminal-passthrough", command)
+    self.assertNotIn("--no-terminal-passthrough", command)
+    self.assertIn("--terminal-passthrough", command)
     self.assertNotIn("--display", command)
     self.assertNotIn(str(stack.ROOTS[0]), command)
     self.assertNotIn(str(stack.ROOTS[1]), command)
@@ -128,7 +130,7 @@ class StackTests(unittest.TestCase):
     execute.assert_called_once_with(["fake-ai-jail"])
     self.assertTrue(stack.DRY)
 
-  def test_launch_retains_arguments_and_no_unrestricted_network(self):
+  def test_launch_retains_arguments_and_network_is_allowed(self):
     for root in stack.ROOTS:
       root.mkdir(parents=True)
     self.put(".config/ai-stack/gitconfig", "# test")
@@ -137,8 +139,8 @@ class StackTests(unittest.TestCase):
     with patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), patch.object(stack, "native_memory", return_value=native), patch.object(stack.shutil, "which", side_effect=lambda name: str(tool) if name == "opencode" else ("/usr/bin/ai-jail" if name == "ai-jail" else None)):
       command = stack.launch_command("opencode", ["--prompt", "keep this argument", "--fresh"])
       self.assertIn("--private-home", command)
-      self.assertIn("--no-network", command)
-      self.assertNotIn("--network", command)
+      self.assertIn("--network", command)
+      self.assertNotIn("--no-network", command)
       self.assertNotIn("--ssh", command)
       self.assertNotIn("--no-terminal-passthrough", command)
       self.assertIn("--terminal-passthrough", command)
@@ -181,9 +183,8 @@ class StackTests(unittest.TestCase):
     self.assertNotIn(tool.parent, command)
     self.assertIn("/tmp/.ai-stack-codex", command)
     self.assertIn("--deny-path", command)
-    self.assertIn("--no-daemon", command)
 
-  def test_codex_standalone_mount_avoids_overlap_and_forces_no_daemon(self):
+  def test_codex_standalone_mount_avoids_overlap(self):
     for root in stack.ROOTS:
       root.mkdir(parents=True)
     self.put(".config/ai-stack/gitconfig", "# test")
@@ -196,7 +197,7 @@ class StackTests(unittest.TestCase):
     self.assertNotIn(tool.parent, command)
     self.assertIn("/tmp/.ai-stack-codex", command)
     self.assertIn("--deny-path", command)
-    self.assertIn("--no-daemon", command)
+    self.assertNotIn("--no-daemon", command)
     # Make sure the legacy npm node_modules mount is not forced for Codex.
     self.assertNotIn("node_modules", " ".join(command))
     # Node may still be mapped for OpenCode; here we only assert Codex itself.

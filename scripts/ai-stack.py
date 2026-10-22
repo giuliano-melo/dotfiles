@@ -519,17 +519,17 @@ def launch_command(harness, native_args, here=False):
   if not tool or not jail:
     fail(f"Missing ai-jail or {harness}; run install first")
   tool = Path(tool).resolve()
-  flags = [jail, "--private-home", "--no-agent-state", "--no-network", "--no-inherit-env",
+  flags = [jail, "--private-home", "--no-agent-state", "--network", "--no-inherit-env",
            "--no-ssh", "--no-docker", "--no-systemd-user", "--no-toolchains", "--no-mise",
            "--no-save-config", "--forward-port", "49374"]
-  if harness == "opencode":
-    # OpenCode's TUI copies through OSC 52 clipboard sequences, which ai-jail's
-    # PTY proxy filters unless raw terminal passthrough is on. Enable it
-    # explicitly: ai-jail command tables cannot select this, because the
+  if harness in {"opencode", "codex"}:
+    # OpenCode and Codex TUIs copy through OSC 52 clipboard sequences, which
+    # ai-jail's PTY proxy filters unless raw terminal passthrough is on. Enable
+    # it explicitly: ai-jail command tables cannot select this, because the
     # jailed argv starts with /usr/bin/env, not the harness name.
     flags.append("--terminal-passthrough")
   else:
-    # Codex and Kimi keep raw terminal passthrough disabled.
+    # Kimi keeps raw terminal passthrough disabled.
     flags.append("--no-terminal-passthrough")
   # Forward names only, never literal secret values in argv or tracked config.
   # glab's active credential may be in the host environment rather than YAML.
@@ -543,12 +543,10 @@ def launch_command(harness, native_args, here=False):
   for key in api_keys[harness]:
     if os.environ.get(key):
       flags += ["--env", key]
-  for line in (REPO / "ai/allowed-hosts.txt").read_text().splitlines():
-    host = line.split("#", 1)[0].strip()
-    if host:
-      if not re.fullmatch(r"[a-z0-9]+(?:[.-][a-z0-9]+)*", host):
-        fail("Invalid allowlist hostname")
-      flags += ["--allow-host", host]
+  # Internet access is allowed inside the jail. File/process isolation (private
+  # home, no SSH/Docker/systemd, no inherited env) remains in place, so the
+  # main sandbox boundary is preserved without maintaining a host allowlist.
+  # allowed-hosts.txt is kept as documentation of previously observed endpoints.
 
   def mount(path, writable=False):
     if path.exists():
@@ -614,11 +612,6 @@ def launch_command(harness, native_args, here=False):
     if any(arg == "--server" or arg.startswith("--server=") for arg in native_args):
       fail("--server is not allowed in managed launches; use the private server")
     native_args = ["--standalone", *native_args]
-  if harness == "codex":
-    # Codex's background daemon cannot persist inside the jail's tmpfs home. Force
-    # the self-contained mode so it runs without the shared background server.
-    if "--no-daemon" not in native_args:
-      native_args = ["--no-daemon", *native_args]
   return flags + ["--", "/usr/bin/env", *env, "/bin/sh", "/tmp/.ai-stack-entry.sh", str(native), "run", "--require-server", "--no-autowire",
                   "--executable", str(jail_tool), harness, *native_args]
 

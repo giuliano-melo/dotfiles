@@ -120,32 +120,33 @@ For a project outside those two roots, `jail-here <harness>` opts into using onl
 the current directory as the writable workspace. For example, `cd` to a specific
 project first, then run `jail-here codex`, `jail-here kimi`, or
 `jail-here opencode2`. It keeps the same ai-jail → ai-memory → CLI launch path
-and network/credential restrictions. It refuses HOME, its ancestors, broad
-system directories, and parent directories of the configured workspaces. Regular
+and credential restrictions. It refuses HOME, its ancestors, broad system
+directories, and parent directories of the configured workspaces. Regular
 `codex`, `kimi`, `opencode2`, and `jail` commands remain restricted to the
 existing roots.
 
-The managed OpenCode launcher explicitly enables raw terminal passthrough so
-OpenCode's TUI can send OSC 52 clipboard sequences through ai-jail's PTY proxy.
-A global `[commands.opencode]` setting cannot do this: ai-jail selects command
+The managed OpenCode and Codex launchers explicitly enable raw terminal
+passthrough so their TUIs can send OSC 52 clipboard sequences through ai-jail's
+PTY proxy. A global `[commands.*]` setting cannot do this: ai-jail selects command
 tables from the jailed argv, and the managed argv starts with `/usr/bin/env`,
-not the harness name. Codex and Kimi explicitly keep passthrough disabled. Raw
-passthrough exposes terminal escape/query behavior to programs in the OpenCode
-jail; that trade-off is accepted there for clipboard support.
+not the harness name. Kimi keeps passthrough disabled. Raw passthrough exposes
+terminal escape/query behavior to programs in the jail; that trade-off is
+accepted for OpenCode and Codex to support clipboard integration.
 
 Codex is now a self-contained standalone binary installed under `~/.codex`. The
 managed launcher exposes the executable at a read-only path outside that writable
 state tree and denies the original `bin` directory, avoiding overlapping mount
-warnings. It also passes `--no-daemon` so Codex does not try to use a
-persisting background server inside the jail's fresh tmpfs home.
+warnings. You can still pass `--no-daemon` yourself if you want to avoid Codex's
+background server inside the jail's fresh tmpfs home.
 
 The regular launcher rejects working directories outside the two workspace
 roots, including HOME. Both roots remain writable in regular launches. It
 exposes only the active harness's persistent state, ai-memory client state,
 read-only skills and Git/glab config, and required runtime binaries. Docker, SSH,
 full inherited environment, systemd-user IPC, and automatic registry egress are
-off. Raw terminal passthrough is off except for OpenCode (see above). OpenCode
-always runs a **private server inside
+off. Internet access is allowed (the file-system and process isolation is the
+main sandbox boundary), and raw terminal passthrough is on for OpenCode and Codex
+(see above). OpenCode always runs a **private server inside
 the jail**; connecting it to an explicit host server is refused.
 
 Writable ai-memory client caches/spools live in
