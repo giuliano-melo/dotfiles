@@ -521,7 +521,7 @@ def launch_command(harness, native_args, here=False):
   tool = Path(tool).resolve()
   flags = [jail, "--private-home", "--no-agent-state", "--network", "--no-inherit-env",
            "--no-ssh", "--no-docker", "--no-systemd-user", "--no-toolchains", "--no-mise",
-           "--no-save-config", "--forward-port", "49374"]
+           "--no-save-config"]
   if harness in {"opencode", "codex"}:
     # OpenCode and Codex TUIs copy through OSC 52 clipboard sequences, which
     # ai-jail's PTY proxy filters unless raw terminal passthrough is on. Enable
@@ -557,7 +557,6 @@ def launch_command(harness, native_args, here=False):
   mount(CLIENT, True)
   mount(MEMORY / "native-runner")
   mount(MEMORY / "hooks")
-  mount(native.parent)
   jail_tool = tool
   if harness == "kimi" and HOME / ".kimi-code" in tool.parents:
     # Kimi installs its binary *inside* its writable state root. Put the binary
