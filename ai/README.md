@@ -149,6 +149,12 @@ main sandbox boundary), and raw terminal passthrough is on for OpenCode and Code
 (see above). OpenCode always runs a **private server inside
 the jail**; connecting it to an explicit host server is refused.
 
+If `~/.config/google-chrome` exists it is also mounted read-write so the
+Playwright MCP `--extension` mode can find and launch the Chrome profile that
+has the Playwright extension installed. Use a dedicated test profile, not your
+personal Chrome profile, because the jail can read its cookies and extension
+state.
+
 Writable ai-memory client caches/spools live in
 `~/.local/share/ai-stack/memory`, separate from the read-only native runner and
 the host server's database. Existing server history and old client spools are

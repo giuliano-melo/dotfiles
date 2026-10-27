@@ -203,6 +203,20 @@ class StackTests(unittest.TestCase):
     # Node may still be mapped for OpenCode; here we only assert Codex itself.
     self.assertIn(str(stack.ROOTS[0]), command)
 
+  def test_chrome_config_is_mounted_for_playwright_mcp_extension(self):
+    for root in stack.ROOTS:
+      root.mkdir(parents=True)
+    self.put(".config/ai-stack/gitconfig", "# test")
+    chrome = self.put(".config/google-chrome/Default/Extensions/mmlmfjhmonkocbjadbfplnigmagldckm/0.0.0_0/manifest.json", "{}")
+    native = self.put(".local/share/ai-memory/native-runner/ai-memory", "native")
+    tool = self.put(".opencode/bin/opencode", "native")
+    with patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), \
+         patch.object(stack, "native_memory", return_value=native), \
+         patch.object(stack.shutil, "which", side_effect=lambda name: str(tool) if name == "opencode" else ("/usr/bin/ai-jail" if name == "ai-jail" else None)):
+      command = stack.launch_command("opencode", [])
+    rw_maps = [command[i + 1] for i, item in enumerate(command[:-1]) if item == "--rw-map"]
+    self.assertIn(str(chrome.parents[4]), rw_maps)
+
   def test_probe_executes_env_after_the_entry_script(self):
     from types import SimpleNamespace
     self.put(".config/ai-stack/skills/demo/SKILL.md", "test")

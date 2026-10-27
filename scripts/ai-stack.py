@@ -589,6 +589,12 @@ def launch_command(harness, native_args, here=False):
             "opencode": [HOME / ".config/opencode", HOME / ".local/share/opencode", HOME / ".local/state/opencode", HOME / ".cache/opencode"]}
   for path in states[harness]:
     mount(path, True)
+  # Playwright MCP in --extension mode needs to find and launch the Chrome
+  # profile that has the Playwright extension installed. Expose the whole
+  # config directory read-write because Chrome updates locks/state files.
+  chrome_config = HOME / ".config/google-chrome"
+  if chrome_config.is_dir():
+    mount(chrome_config, True)
   # Skill links resolve to read-only CONFIG/repo mounts. Do not add a nested
   # RO mount under the RW state root: ai-jail rejects BOTH overlapping maps.
   glab_config = HOME / ".config/glab-cli"
