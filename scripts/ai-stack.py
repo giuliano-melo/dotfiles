@@ -493,6 +493,12 @@ def server(args):
   run([native_memory(), "setup", "--agent", "codex", "--agent", "kimi-code", "--agent", "opencode2"])
 
 
+def docker_requested():
+  # The host Docker socket is root-equivalent, so it is opt-in per launch
+  # (`with-docker <harness>` or AI_DOCKER=1) and never the default.
+  return os.environ.get("AI_DOCKER", "").strip().lower() in {"1", "true", "yes"}
+
+
 def launch_command(harness, native_args, here=False):
   if platform.system() != "Linux":
     fail("Managed sandbox launcher currently targets Linux")
@@ -520,8 +526,8 @@ def launch_command(harness, native_args, here=False):
     fail(f"Missing ai-jail or {harness}; run install first")
   tool = Path(tool).resolve()
   flags = [jail, "--private-home", "--no-agent-state", "--network", "--no-inherit-env",
-           "--no-ssh", "--no-docker", "--no-systemd-user", "--no-toolchains", "--no-mise",
-           "--no-save-config"]
+           "--no-ssh", "--docker" if docker_requested() else "--no-docker", "--no-systemd-user",
+           "--no-toolchains", "--no-mise", "--no-save-config"]
   if harness in {"opencode", "codex"}:
     # OpenCode and Codex TUIs copy through OSC 52 clipboard sequences, which
     # ai-jail's PTY proxy filters unless raw terminal passthrough is on. Enable
@@ -554,8 +560,9 @@ def launch_command(harness, native_args, here=False):
   if harness == "opencode" and os.environ.get("PLAYWRIGHT_MCP_EXTENSION_TOKEN"):
     flags += ["--env", "PLAYWRIGHT_MCP_EXTENSION_TOKEN"]
   # Internet access is allowed inside the jail. File/process isolation (private
-  # home, no SSH/Docker/systemd, no inherited env) remains in place, so the
-  # main sandbox boundary is preserved without maintaining a host allowlist.
+  # home, no SSH/systemd, no Docker unless AI_DOCKER=1, no inherited env)
+  # remains in place, so the main sandbox boundary is preserved without
+  # maintaining a host allowlist.
   # allowed-hosts.txt is kept as documentation of previously observed endpoints.
 
   def mount(path, writable=False):
@@ -803,6 +810,9 @@ def main():
     return
   if args.action in {"launch", "launch-here"}:
     cmd = launch_command(args.harness, args.native_args, here=args.action == "launch-here")
+    if "--docker" in cmd:
+      print("WARNING: host Docker socket enabled for this session (AI_DOCKER); "
+            "containers can access the host as root.", file=sys.stderr, flush=True)
     exec_or_preview(cmd)
     return
   if args.action == "configure":

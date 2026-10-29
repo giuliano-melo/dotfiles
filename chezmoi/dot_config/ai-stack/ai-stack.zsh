@@ -10,7 +10,7 @@ path=("${HOME}/.local/bin" "${HOME}/.kimi-code/bin" "${path[@]}")
 export PATH
 
 if [[ -f "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" ]]; then
-  unalias jail jail-here jail-spec jail-code codex kimi opencode opencode2 2>/dev/null
+  unalias jail jail-here jail-spec jail-code codex kimi opencode opencode2 with-docker 2>/dev/null
 
   jail() {
     bash "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" launch "$@"
@@ -24,6 +24,11 @@ if [[ -f "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" ]]; then
   opencode2() { jail opencode "$@"; }
   jail-spec() { (cd "${HOME}/Dev/sympla" && jail "$@"); }
   jail-code() { (cd "${HOME}/Documents/gcrm/Linear" && jail "$@"); }
+  # Opt in to the host Docker socket (root-equivalent) for one launch only.
+  with-docker() {
+    (( $# )) || { print -u2 'usage: with-docker <codex|kimi|opencode|opencode2|jail|jail-here|...> [args]'; return 2; }
+    (export AI_DOCKER=1; "$@")
+  }
   alias jails='cd "${HOME}/Dev/sympla"'
   alias jaill='cd "${HOME}/Documents/gcrm/Linear"'
   ai-check() { bash "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" check "$@"; }

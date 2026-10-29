@@ -125,6 +125,23 @@ directories, and parent directories of the configured workspaces. Regular
 `codex`, `kimi`, `opencode2`, and `jail` commands remain restricted to the
 existing roots.
 
+Docker is off by default. To give one session the host Docker socket (for
+`docker`, `docker compose`, or Testcontainers), prefix the launch with
+`with-docker`:
+
+```sh
+with-docker opencode
+with-docker codex --some-codex-argument
+with-docker jail-here kimi
+```
+
+`with-docker` only sets `AI_DOCKER=1` for that one command (an exported
+`AI_DOCKER=1` has the same effect for every launch from that shell). The
+launcher then passes `--docker` instead of `--no-docker` to ai-jail and prints a
+warning. **The host Docker socket is root-equivalent:** a container can mount any
+host path, so the jail's file isolation does not hold for that session. Registry
+credentials (`~/.docker/config.json`) are still not shared.
+
 The managed OpenCode and Codex launchers explicitly enable raw terminal
 passthrough so their TUIs can send OSC 52 clipboard sequences through ai-jail's
 PTY proxy. A global `[commands.*]` setting cannot do this: ai-jail selects command
@@ -142,7 +159,8 @@ background server inside the jail's fresh tmpfs home.
 The regular launcher rejects working directories outside the two workspace
 roots, including HOME. Both roots remain writable in regular launches. It
 exposes only the active harness's persistent state, ai-memory client state,
-read-only skills and Git/glab config, and required runtime binaries. Docker, SSH,
+read-only skills and Git/glab config, and required runtime binaries. Docker
+(unless opted in with `with-docker`), SSH,
 full inherited environment, systemd-user IPC, and automatic registry egress are
 off. Internet access is allowed (the file-system and process isolation is the
 main sandbox boundary), and raw terminal passthrough is on for OpenCode and Codex
@@ -242,7 +260,8 @@ authenticate it.
 The jail uses unrestricted networking so model APIs, remote MCPs, OAuth
 endpoints, and documentation sites all work without maintaining a host
 allowlist. File-system and process isolation (`--private-home`, `--no-ssh`,
-`--no-docker`, `--no-systemd-user`, `--no-inherit-env`) remains the main sandbox
+`--no-docker` unless `with-docker` is used, `--no-systemd-user`,
+`--no-inherit-env`) remains the main sandbox
 boundary. The host ai-memory server is reachable at `127.0.0.1:49374` from
 inside the jail, so `AI_MEMORY_SERVER_URL` still points to the same loopback
 address. Port 49374 exposes the **entire ai-memory service**; use server-side

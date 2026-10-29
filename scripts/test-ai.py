@@ -181,6 +181,36 @@ class StackTests(unittest.TestCase):
     for name in display_env:
       self.assertNotIn(name, codex_command)
 
+  def test_docker_socket_is_opt_in_per_launch(self):
+    for root in stack.ROOTS:
+      root.mkdir(parents=True)
+    self.put(".config/ai-stack/gitconfig", "# test")
+    native = self.put(".local/share/ai-memory/native-runner/ai-memory", "native")
+    tools = {name: self.put(f".local/bin/{name}", "native") for name in ["codex", "kimi", "opencode"]}
+    which = lambda name: str(tools[name]) if name in tools else ("/usr/bin/ai-jail" if name == "ai-jail" else None)
+    for harness in tools:
+      for env, enabled in [({}, False), ({"AI_DOCKER": "0"}, False), ({"AI_DOCKER": "1"}, True)]:
+        with patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), \
+             patch.object(stack, "native_memory", return_value=native), \
+             patch.object(stack.shutil, "which", side_effect=which), \
+             patch.dict(os.environ, env, clear=True):
+          command = stack.launch_command(harness, ["--keep"])
+        jail_flags = command[:command.index("--")]
+        self.assertEqual("--docker" in jail_flags, enabled, (harness, env))
+        self.assertEqual("--no-docker" in jail_flags, not enabled, (harness, env))
+        self.assertNotIn("--docker-config", command)
+        self.assertNotIn("AI_DOCKER", command)
+        self.assertEqual(command[-1], "--keep")
+
+  def test_docker_opt_in_prints_warning(self):
+    import sys
+    with patch.object(sys, "argv", ["ai-stack.py", "launch", "codex"]), \
+         patch.object(stack, "launch_command", return_value=["fake-ai-jail", "--docker", "--"]), \
+         patch.object(stack, "exec_or_preview"), \
+         contextlib.redirect_stderr(io.StringIO()) as err:
+      stack.main()
+    self.assertIn("host Docker socket enabled", err.getvalue())
+
   def test_extra_jail_policy_is_never_discarded(self):
     path = self.put(".ai-jail", 'mask = [".env"]\n')
     with self.assertRaises(RuntimeError):
