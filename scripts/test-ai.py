@@ -144,11 +144,42 @@ class StackTests(unittest.TestCase):
       self.assertNotIn("--ssh", command)
       self.assertNotIn("--no-terminal-passthrough", command)
       self.assertIn("--terminal-passthrough", command)
-      self.assertNotIn("--display", command)
+      self.assertIn("--display", command)
+      for name in ["DISPLAY", "WAYLAND_DISPLAY", "XDG_RUNTIME_DIR", "XAUTHORITY"]:
+        self.assertIn(name, command)
       self.assertIn("--require-server", command)
       self.assertEqual(command[-4:], ["--standalone", "--prompt", "keep this argument", "--fresh"])
       with self.assertRaisesRegex(RuntimeError, "--server"):
         stack.launch_command("opencode", ["--server=http://localhost:4096"])
+
+  def test_display_passthrough_is_opencode_only_and_forwards_names(self):
+    for root in stack.ROOTS:
+      root.mkdir(parents=True)
+    self.put(".config/ai-stack/gitconfig", "# test")
+    native = self.put(".local/share/ai-memory/native-runner/ai-memory", "native")
+    opencode = self.put(".opencode/bin/opencode", "native")
+    codex = self.put(".local/bin/codex", "native")
+    display_env = {
+      "DISPLAY": ":91",
+      "WAYLAND_DISPLAY": "wayland-test",
+      "XDG_RUNTIME_DIR": "/run/user/1000",
+      "XAUTHORITY": "/tmp/test-xauthority",
+    }
+    which = lambda name: str(opencode if name == "opencode" else codex) if name in {"opencode", "codex"} else ("/usr/bin/ai-jail" if name == "ai-jail" else None)
+    with patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), \
+         patch.object(stack, "native_memory", return_value=native), \
+         patch.object(stack.shutil, "which", side_effect=which), \
+         patch.dict(os.environ, display_env, clear=True):
+      command = stack.launch_command("opencode", [])
+      self.assertIn("--display", command)
+      for name in display_env:
+        self.assertIn(name, command)
+      for value in display_env.values():
+        self.assertNotIn(value, command)
+      codex_command = stack.launch_command("codex", [])
+    self.assertNotIn("--display", codex_command)
+    for name in display_env:
+      self.assertNotIn(name, codex_command)
 
   def test_extra_jail_policy_is_never_discarded(self):
     path = self.put(".ai-jail", 'mask = [".env"]\n')
@@ -183,6 +214,28 @@ class StackTests(unittest.TestCase):
     self.assertNotIn(tool.parent, command)
     self.assertIn("/tmp/.ai-stack-codex", command)
     self.assertIn("--deny-path", command)
+
+  def test_playwright_extension_token_is_forwarded_only_when_set(self):
+    for root in stack.ROOTS:
+      root.mkdir(parents=True)
+    self.put(".config/ai-stack/gitconfig", "# test")
+    native = self.put(".local/share/ai-memory/native-runner/ai-memory", "native")
+    tool = self.put(".opencode/bin/opencode", "native")
+    which = lambda name: str(tool) if name == "opencode" else ("/usr/bin/ai-jail" if name == "ai-jail" else None)
+    with patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), \
+         patch.object(stack, "native_memory", return_value=native), \
+         patch.object(stack.shutil, "which", side_effect=which), \
+         patch.dict(os.environ, {"PLAYWRIGHT_MCP_EXTENSION_TOKEN": "test-playwright-token"}, clear=True):
+      command = stack.launch_command("opencode", [])
+    self.assertIn("PLAYWRIGHT_MCP_EXTENSION_TOKEN", command)
+    self.assertNotIn("test-playwright-token", command)
+
+    with patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), \
+         patch.object(stack, "native_memory", return_value=native), \
+         patch.object(stack.shutil, "which", side_effect=which), \
+         patch.dict(os.environ, {}, clear=True):
+      command = stack.launch_command("opencode", [])
+    self.assertNotIn("PLAYWRIGHT_MCP_EXTENSION_TOKEN", command)
 
   def test_codex_standalone_mount_avoids_overlap(self):
     for root in stack.ROOTS:

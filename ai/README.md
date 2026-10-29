@@ -153,7 +153,13 @@ If `~/.config/google-chrome` exists it is also mounted read-write so the
 Playwright MCP `--extension` mode can find and launch the Chrome profile that
 has the Playwright extension installed. Use a dedicated test profile, not your
 personal Chrome profile, because the jail can read its cookies and extension
-state.
+state. If `PLAYWRIGHT_MCP_EXTENSION_TOKEN` is set in the host environment when
+launching OpenCode, the launcher forwards its name to the jail; the token value
+is not written to the launcher command or dotfiles. When a host display is
+available, only the OpenCode jail also receives display passthrough and the
+defined display environment variables so Chrome can show the extension's
+connection page. GUI programs in that jail can interact with the host display;
+keep using the dedicated test profile.
 
 Writable ai-memory client caches/spools live in
 `~/.local/share/ai-stack/memory`, separate from the read-only native runner and

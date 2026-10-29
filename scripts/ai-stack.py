@@ -531,6 +531,14 @@ def launch_command(harness, native_args, here=False):
   else:
     # Kimi keeps raw terminal passthrough disabled.
     flags.append("--no-terminal-passthrough")
+  display_env = ("DISPLAY", "WAYLAND_DISPLAY", "XDG_RUNTIME_DIR", "XAUTHORITY")
+  if harness == "opencode" and any(os.environ.get(key) for key in display_env):
+    # Playwright MCP --extension opens a connect page in Chrome. Keep GUI
+    # passthrough scoped to OpenCode and explicitly forward only display vars.
+    flags.append("--display")
+    for key in display_env:
+      if os.environ.get(key):
+        flags += ["--env", key]
   # Forward names only, never literal secret values in argv or tracked config.
   # glab's active credential may be in the host environment rather than YAML.
   if os.environ.get("GITLAB_TOKEN"):
@@ -543,6 +551,8 @@ def launch_command(harness, native_args, here=False):
   for key in api_keys[harness]:
     if os.environ.get(key):
       flags += ["--env", key]
+  if harness == "opencode" and os.environ.get("PLAYWRIGHT_MCP_EXTENSION_TOKEN"):
+    flags += ["--env", "PLAYWRIGHT_MCP_EXTENSION_TOKEN"]
   # Internet access is allowed inside the jail. File/process isolation (private
   # home, no SSH/Docker/systemd, no inherited env) remains in place, so the
   # main sandbox boundary is preserved without maintaining a host allowlist.
