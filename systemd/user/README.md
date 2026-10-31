@@ -13,6 +13,19 @@ repositories. It reports old Docker images and stale worktree metadata without
 removing them. It never deletes volumes, containers, branches, project files,
 application caches, logs, or personal data.
 
+The default output is concise, with progress shown on a terminal. Add
+`--verbose` to either mode to see cache records, old Docker images and detailed
+Git repository reports. The summary uses color only on a terminal and respects
+`NO_COLOR`.
+
+Use `--docker` or `--git` to select just that category (they may be combined).
+With no category option, both remain selected. `--worktrees` is a separate,
+explicit category: first preview with `--worktrees --dry-run`, then use
+`--worktrees --apply` to prune eligible stale metadata older than 30 days. It
+does not remove worktree directories. Docker's reported reclaimed space and the
+approximate change in Git data size are shown after apply when available; Git
+size changes can reflect concurrent work or background maintenance.
+
 After reviewing the output, you can choose **Monthly cleanup timer** in the
 machine setup checklist or pass `--cleanup-timer` to
 `scripts/setup-machine.sh --apply`. This remains opt-in; setup previews the
