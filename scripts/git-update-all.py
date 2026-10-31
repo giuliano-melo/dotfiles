@@ -15,9 +15,14 @@ def git(repo, *args):
                         env={**os.environ, 'GIT_TERMINAL_PROMPT': '0'})
 
 
-def repositories(root):
+def repositories(root, counts):
   def onerror(error):
-    raise error
+    if isinstance(error, FileNotFoundError) and error.filename != str(root):
+      counts['vanished'] += 1
+      print(f'WARNING: directory disappeared during scan: {error.filename}', file=sys.stderr)
+    else:
+      counts['scan_errors'] += 1
+      print(f'ERROR: cannot scan directory: {error}', file=sys.stderr)
   for current, dirs, files in os.walk(root, followlinks=False, onerror=onerror):
     if '.git' in dirs or '.git' in files:
       yield Path(current)
@@ -31,9 +36,9 @@ def main():
   args = parser.parse_args()
   if not args.directory.is_dir():
     parser.error('directory does not exist or is not a directory')
-  counts = {'updated': 0, 'skipped': 0, 'failed': 0}
+  counts = {'updated': 0, 'skipped': 0, 'failed': 0, 'vanished': 0, 'scan_errors': 0}
   try:
-    for repo in repositories(args.directory.resolve()):
+    for repo in repositories(args.directory.resolve(), counts):
       print(f'\n{repo}', flush=True)
       status = git(repo, 'status', '--porcelain=v1', '--untracked-files=normal', '--ignore-submodules=none')
       if status.returncode:
@@ -63,7 +68,9 @@ def main():
     print(f'ERROR: directory traversal failed: {error}', file=sys.stderr)
     return 1
   print(f"\nSummary: {counts['updated']} updated, {counts['skipped']} skipped/previewed, {counts['failed']} failed")
-  return 1 if counts['failed'] else 0
+  if counts['vanished'] or counts['scan_errors']:
+    print(f"Directory scan: {counts['vanished']} disappeared, {counts['scan_errors']} errors", file=sys.stderr)
+  return 1 if counts['failed'] or counts['scan_errors'] else 0
 
 
 if __name__ == '__main__':
