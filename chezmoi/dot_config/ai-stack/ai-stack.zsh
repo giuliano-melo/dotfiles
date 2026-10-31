@@ -32,4 +32,5 @@ if [[ -f "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" ]]; then
   alias jails='cd "${HOME}/Dev/sympla"'
   alias jaill='cd "${HOME}/Documents/gcrm/Linear"'
   ai-check() { bash "${HOME}/.config/ai-stack/repo/scripts/setup-ai.sh" check "$@"; }
+  git-update-all() { python3 "${HOME}/.config/ai-stack/repo/scripts/git-update-all.py" "$@"; }
 fi

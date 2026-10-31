@@ -58,6 +58,13 @@ make only the current directory writable.
 
 ## Monthly cleanup
 
+To update Git repositories recursively, run `git-update-all --dry-run ~/Dev`
+to preview, then `git-update-all ~/Dev`. The command skips dirty worktrees,
+detached HEADs and branches without an upstream, and only allows fast-forward
+updates. The preview uses local information and does not fetch remote changes.
+The shell command is available after loading the managed AI shell fragment;
+alternatively run `python3 ~/Dev/dotfiles/scripts/git-update-all.py ~/Dev`.
+
 `bash scripts/cleanup-system.sh --dry-run` reports eligible Docker build cache,
 old images for review, and local Git repository maintenance. Dry-run is the
 default; `--apply` prunes only Buildx cache older than 30 days and runs Git's
