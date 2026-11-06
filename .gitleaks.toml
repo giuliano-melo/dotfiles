@@ -1,0 +1,12 @@
+# gitleaks configuration: allow obvious synthetic placeholders used in tests.
+title = "Dotfiles gitleaks config"
+
+[allowlist]
+  regexTarget = "match"
+  regexes = [
+    '''sonar-test-secret''',
+    '''local-test-value''',
+    '''example-token''',
+    '''your-token-here''',
+    '''YOUR_TOKEN''',
+  ]

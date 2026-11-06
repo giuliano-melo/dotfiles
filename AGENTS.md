@@ -4,6 +4,10 @@
 
 This is a **dotfiles repository** containing shell (bash) and Vim editor configurations. It is not a software project with build/test commands - it stores configuration files that get symlinked to the user's home directory.
 
+### Secret Handling
+
+Never commit real secrets (tokens, private keys, passwords). Host-side credentials are forwarded by name through `ai-jail`, never stored here. The repository includes gitleaks-based secret scanning to catch accidental leaks before they are committed.
+
 ## File Structure
 
 | File | Purpose |
@@ -129,6 +133,13 @@ nnoremap <leader>tn :TestNearest<CR>
 - Keep commit messages concise and descriptive
 - Focus on "why" rather than "what"
 - Example: "Add Go path auto-detection in dev directories"
+
+### Preventing Secret Leaks
+
+- Add gitleaks to your host PATH, or use `gitleaks detect --source .` to scan before committing.
+- A `pre-commit` hook runs `gitleaks detect --source . --verbose` on every commit.
+- Use the same synthetic placeholder values in tests (e.g., `sonar-test-secret`, `local-test-value`) if a value is required; these are detected as allowed test strings, not real credentials.
+- Keep `.gitignore` rules up to date for files that may contain secrets (`*.env`, `.netrc`, keys).
 
 ## Common Tasks
 
