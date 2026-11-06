@@ -136,9 +136,10 @@ nnoremap <leader>tn :TestNearest<CR>
 
 ### Preventing Secret Leaks
 
-- Add gitleaks to your host PATH, or use `gitleaks detect --source .` to scan before committing.
-- A `pre-commit` hook runs `gitleaks detect --source . --verbose` on every commit.
-- Use the same synthetic placeholder values in tests (e.g., `sonar-test-secret`, `local-test-value`) if a value is required; these are detected as allowed test strings, not real credentials.
+- gitleaks is installed at `~/.local/bin/gitleaks` and should already be on PATH.
+- Run `gitleaks detect --source . --verbose` before committing a sensitive change.
+- A `pre-commit` hook runs the same scan on every commit in this repository.
+- Use the same synthetic placeholder values in tests (e.g., `sonar-test-secret`, `local-test-value`) if a value is required; these are allowlisted, not real credentials.
 - Keep `.gitignore` rules up to date for files that may contain secrets (`*.env`, `.netrc`, keys).
 
 ## Common Tasks
