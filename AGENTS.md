@@ -137,8 +137,10 @@ nnoremap <leader>tn :TestNearest<CR>
 ### Preventing Secret Leaks
 
 - gitleaks is installed at `~/.local/bin/gitleaks` and should already be on PATH.
+  To install or update it, run `scripts/install-gitleaks.sh [version]`.
 - Run `gitleaks detect --source . --verbose` before committing a sensitive change.
 - A `pre-commit` hook runs the same scan on every commit in this repository.
+  Reinstall it with `scripts/install-git-hooks.sh` after a fresh clone.
 - Use the same synthetic placeholder values in tests (e.g., `sonar-test-secret`, `local-test-value`) if a value is required; these are allowlisted, not real credentials.
 - Keep `.gitignore` rules up to date for files that may contain secrets (`*.env`, `.netrc`, keys).
 
