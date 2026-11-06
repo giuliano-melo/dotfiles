@@ -88,8 +88,11 @@ Its config is mounted read-only at a private source path and copied to a
 disposable in-jail directory: glab 1.53 needs a writable config even for read-only
 API calls. Changes never write back to the host config. A host `GITLAB_TOKEN`
 (or fallback `OAUTH_TOKEN`) is passed by **name**, never embedded in argv/config.
-Only selected API-key variables and ai-memory authentication are passed in
-addition; the full host environment is not inherited.
+When `SONAR_TOKEN` is set in the host environment, it is also passed by name
+to Codex, Kimi, and OpenCode; its value is not embedded in argv or config. Only
+selected API-key variables and ai-memory authentication are passed in addition;
+the full host environment is not inherited. Forwarded tokens are accessible to
+processes inside the jail.
 Do not expose the desktop DBus/keyring socket
 to make login work. Provision a suitably scoped GitLab credential on the host;
 read-only mounting prevents edits, not use or theft of the credential.

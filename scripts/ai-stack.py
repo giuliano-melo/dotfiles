@@ -553,6 +553,8 @@ def launch_command(harness, native_args, here=False):
     flags += ["--env", "OAUTH_TOKEN"]
   if os.environ.get("AI_MEMORY_AUTH_TOKEN"):
     flags += ["--env", "AI_MEMORY_AUTH_TOKEN"]
+  if os.environ.get("SONAR_TOKEN"):
+    flags += ["--env", "SONAR_TOKEN"]
   api_keys = {"codex": ["OPENAI_API_KEY"], "kimi": ["MOONSHOT_API_KEY"], "opencode": ["OPENAI_API_KEY"]}
   for key in api_keys[harness]:
     if os.environ.get(key):

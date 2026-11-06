@@ -245,6 +245,26 @@ class StackTests(unittest.TestCase):
     self.assertIn("/tmp/.ai-stack-codex", command)
     self.assertIn("--deny-path", command)
 
+  def test_sonar_token_is_forwarded_by_name_for_all_harnesses(self):
+    for root in stack.ROOTS:
+      root.mkdir(parents=True)
+    self.put(".config/ai-stack/gitconfig", "# test")
+    native = self.put(".local/share/ai-memory/native-runner/ai-memory", "native")
+    tools = {name: self.put(f".local/bin/{name}", "native") for name in ["codex", "kimi", "opencode"]}
+    which = lambda name: str(tools[name]) if name in tools else ("/usr/bin/ai-jail" if name == "ai-jail" else None)
+    for harness in tools:
+      for value in (None, "", "sonar-test-secret"):
+        env = {} if value is None else {"SONAR_TOKEN": value}
+        with self.subTest(harness=harness, token_set=bool(value)), \
+             patch.object(stack.Path, "cwd", return_value=stack.ROOTS[0]), \
+             patch.object(stack, "native_memory", return_value=native), \
+             patch.object(stack.shutil, "which", side_effect=which), \
+             patch.dict(os.environ, env, clear=True):
+          command = stack.launch_command(harness, [])
+          matches = [i for i, item in enumerate(command[:-1]) if item == "--env" and command[i + 1] == "SONAR_TOKEN"]
+          self.assertEqual(len(matches), int(bool(value)))
+          self.assertNotIn("sonar-test-secret", command)
+
   def test_playwright_extension_token_is_forwarded_only_when_set(self):
     for root in stack.ROOTS:
       root.mkdir(parents=True)
